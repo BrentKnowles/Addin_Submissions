@@ -7,7 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{C78868AA-CE73-4D41-88FA-DFDF90EC872F}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Addin_Submissions</RootNamespace>
+    <RootNamespace>Submissions</RootNamespace>
     <AssemblyName>Addin_Submissions</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -31,4 +31,60 @@
     <ConsolePause>False</ConsolePause>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\yom2013B\coreutilities\coreutilities2013.csproj">
+      <Project>{6EAA0B60-70E3-49FB-88E9-272D2719CECF}</Project>
+      <Name>coreutilities2013</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\yom2013B\Layout\Layout.csproj">
+      <Project>{DA1AA77A-D94D-4F79-AC96-7BC9AF0AFB34}</Project>
+      <Name>Layout</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\yom2013B\MEF_Interfaces\MEF_Interfaces.csproj">
+      <Project>{2E366A51-224A-4C3B-90D6-FE8C81C9EB78}</Project>
+      <Name>MEF_Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\yom2013B\LayoutPanels\LayoutPanels.csproj">
+      <Project>{77AADEE3-CCBF-4802-9703-30EA7A4424AC}</Project>
+      <Name>LayoutPanels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\yom2013B\ApplicationFramework\ApplicationFramework.csproj">
+      <Project>{1C8CC9F9-FD0A-4DDF-B227-61E8135DFCE5}</Project>
+      <Name>ApplicationFramework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\yom2013B\EventTable\TransactionSystem.csproj">
+      <Project>{015AC0C9-2F05-45BE-AD21-5A475AACA2D7}</Project>
+      <Name>TransactionSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\yom2013B\database\database.csproj">
+      <Project>{C08FDDB5-5C59-4611-98E7-76674F290896}</Project>
+      <Name>database</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="mef_Addin_Submissions.cs" />
+    <Compile Include="NoteDataXML_Market.cs" />
+    <Compile Include="PublishTypeListConverter.cs" />
+    <Compile Include="MarketTypeListConverter.cs" />
+    <Compile Include="dashboardSubs.cs" />
+    <Compile Include="dashboardSubs.Designer.cs" />
+    <Compile Include="NoteDataXML_Submissions.cs" />
+    <Compile Include="Market.cs" />
+    <Compile Include="LittleSubmission.cs" />
+    <Compile Include="LittleDestination.cs" />
+    <Compile Include="ViewProjectSubmissions.cs" />
+    <Compile Include="dashboardMarketEdit.cs" />
+    <Compile Include="SubmissionMaster.cs" />
+    <Compile Include="AddEditSubmissionsForm.cs" />
+    <Compile Include="SubmissionEditPanel.cs" />
+    <Compile Include="SubmissionEditPanel.Designer.cs" />
+  </ItemGroup>
 </Project>
