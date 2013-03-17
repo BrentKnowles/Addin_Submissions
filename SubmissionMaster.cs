@@ -136,6 +136,10 @@ namespace Submissions
 
 			// worried this might be slow
 			string returnvalue = Constants.BLANK;
+
+		
+
+
 			if (LayoutDetails.Instance.CurrentLayout == null) {
 				// There is no CurrentLayout while note is first loading
 				NewMessage.Show (Loc.Instance.GetString ("Really bad. You should never see this. It means that a call from a SubmissionNote on a Layout cannot find the Layout it is on."));
@@ -143,6 +147,10 @@ namespace Submissions
 			}
 			//NoteDataXML_Table table = LayoutDetails.Instance.CurrentLayout.FindNoteByGuid(Tablename);
 			List<string> result = LayoutDetails.Instance.CurrentLayout.GetListOfStringsFromSystemTable (Tablename, 2, String.Format ("1|{0}", ToSearchFor));
+
+
+
+
 		//	NewMessage.Show (result.Count.ToString ());
 			if (result != null && result.Count > 0) {
 				returnvalue = result[0];

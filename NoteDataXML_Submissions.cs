@@ -342,7 +342,7 @@ namespace MefAddIns
 
 			Table.ReadOnly = this.ReadOnly;
 
-		//	LayoutDetails.Instance.UpdateAfterLoadList.Add (this);
+			LayoutDetails.Instance.UpdateAfterLoadList.Add (this);
 		}
 
 		void UpdateToggleButtonText ()
@@ -575,14 +575,19 @@ namespace MefAddIns
 			return dt;
 		}
 
-//		public override void UpdateAfterLoad ()
-//		{
-//			base.UpdateAfterLoad ();
-//
-//		//	PerformAnyActionToLoadTables();
-//
-//		//	SubmissionPanel.RefreshMe();
-//		}
+		public override void UpdateAfterLoad ()
+		{
+			base.UpdateAfterLoad ();
+
+
+
+			PerformAnyActionToLoadTables();
+
+			// March 2013
+			// We cannot do this. There are requirements for CurrentLayout to exist and it does not yet at this stage in the load
+			// THis is probably fine since we often will want to swtich to a different view.
+		//	SubmissionPanel.RefreshMe();
+		}
 		/// <summary>
 		/// Registers the type.
 		/// </summary>

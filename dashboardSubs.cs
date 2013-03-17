@@ -84,6 +84,9 @@ namespace MefAddIns
 			lvwColumnSorter = new ListViewColumnSorter ();
 			this.listView1.ListViewItemSorter = lvwColumnSorter;
 			checkBoxReadyToSend.Checked = false;
+
+
+
 			checkBoxSent.Checked = false;
 
 			//NOTE: listviews do not have datasources
