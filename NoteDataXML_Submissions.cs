@@ -55,7 +55,7 @@ namespace MefAddIns
 		dashboardSubs SubmissionPanel = null;
 		dashboardMarketEdit MarketEdit = null;
 		TabControl Tabs = null;
-		ViewProjectSubmissions AddAndEditSubmissionPanel = null;
+		ViewProjectSubmissions ViewOfProjectSubmissions = null;
 		Label LabelProject = null;
 		Label Warnings = null;
 		Label LabelMarket = null;
@@ -242,13 +242,13 @@ namespace MefAddIns
 
 			SubmissionPage.Controls.Add (ToggleBetweenListAndEditSubmissions);
 
-			AddAndEditSubmissionPanel = new ViewProjectSubmissions (GetProjectGUID, GetMarketObjectByGUID);
-			AddAndEditSubmissionPanel.Visible = false;
-			AddAndEditSubmissionPanel.Dock = DockStyle.Fill;
+			ViewOfProjectSubmissions = new ViewProjectSubmissions (GetProjectGUID, GetMarketObjectByGUID);
+			ViewOfProjectSubmissions.Visible = false;
+			ViewOfProjectSubmissions.Dock = DockStyle.Fill;
 
 
-			SubmissionPage.Controls.Add (AddAndEditSubmissionPanel);
-			AddAndEditSubmissionPanel.BringToFront ();
+			SubmissionPage.Controls.Add (ViewOfProjectSubmissions);
+			ViewOfProjectSubmissions.BringToFront ();
 
 			//
 			// MARKET
@@ -400,7 +400,7 @@ namespace MefAddIns
 		}
 
 
-		enum Warning {PROFANITY};
+		enum Warning {PROFANITY, WORDS, PROJECT_BUSY, MARKET_BUSY, PROJECT_HERE_BEFORE};
 	
 
 		private void RefreshWarningsAfterMarketAndProjectUpdated ()
@@ -410,6 +410,26 @@ namespace MefAddIns
 
 			if (MarketEdit.Profanity () == true) {
 				WarningsList.Add (Warning.PROFANITY);
+			}
+
+			if (Constants.BLANK != SelectedGUID) {
+				if (MarketEdit.WordsOver (SelectedGUID) == true) {
+					WarningsList.Add (Warning.WORDS);
+				}
+				if ( ViewOfProjectSubmissions.Available == false ) {
+					WarningsList.Add (Warning.PROJECT_BUSY);
+				}
+				bool ProjectSentHereBefore = false;
+				bool MarketAvailable = true;
+				SubmissionMaster.GetMarketDetailsForWarnings(SelectedMarketGuid, SelectedGUID, out MarketAvailable, out ProjectSentHereBefore);
+				if (false ==MarketAvailable)
+				{
+					WarningsList.Add (Warning.MARKET_BUSY);
+				}
+				if (true == ProjectSentHereBefore)
+				{
+					WarningsList.Add (Warning.PROJECT_HERE_BEFORE);
+				}
 			}
 
 
@@ -423,6 +443,19 @@ namespace MefAddIns
 				switch (warning) {
 				case Warning.PROFANITY:
 					adder = Loc.Instance.GetString ("Profanity -- PG13 or less!");
+					break;
+
+				case Warning.WORDS:
+					adder = Loc.Instance.GetString ("Project has too many or too few words for this market.");
+					break;
+				case Warning.PROJECT_BUSY:
+					adder = Loc.Instance.GetString ("Project already submitted or has already been sold.");
+					break;
+				case Warning.MARKET_BUSY:
+					adder = Loc.Instance.GetString ("There is already a project at this market.");
+					break;
+				case Warning.PROJECT_HERE_BEFORE:
+					adder = Loc.Instance.GetString ("The project was sent to this market before.");
 					break;
 				}
 				if (adder != Constants.BLANK) {
@@ -452,17 +485,22 @@ namespace MefAddIns
 				ToggleBetweenListAndEditSubmissions.Enabled = false;
 			} else {
 				ToggleBetweenListAndEditSubmissions.Enabled = true;
-				RefreshWarningsAfterMarketAndProjectUpdated();
-				MarketEdit.UpdateProjectInformationForFilterBox(SelectedGUID, MasterOfLayouts.GetWordsFromGuid(SelectedGUID));
+		
+				MarketEdit.UpdateProjectInformationForFilterBox (SelectedGUID, MasterOfLayouts.GetWordsFromGuid (SelectedGUID));
 				//UpdateDoTheyLikeMe(SelectedGUID);
 			}
 
-			LabelProject.Text = Loc.Instance.GetStringFmt("Project: {0}", Messages);
+			LabelProject.Text = Loc.Instance.GetStringFmt ("Project: {0}", Messages);
 		
 		
-			UpdateToggleButtonText();
+			UpdateToggleButtonText ();
 			// this becomes enabled once we have a valid selection in the list
+			ViewOfProjectSubmissions.UpdateDoTheyLikeMe (SelectedGUID);
 
+			// we require running after UpdateDoTheyLikeMe
+			if (Constants.BLANK != SelectedGUID) {
+				RefreshWarningsAfterMarketAndProjectUpdated ();
+			}
 		}
 
 		void HandleAddSubmissionClick (object sender, EventArgs e)
@@ -505,8 +543,8 @@ namespace MefAddIns
 					 AddForm.SubEditPanel.ReplyFeedback,
 					 AddForm.SubEditPanel.SubmissionTypeType, SelectedMarket));
 
-					AddAndEditSubmissionPanel.BuildList();
-					AddAndEditSubmissionPanel.UpdateDoTheyLikeMe(SelectedGUID);
+					ViewOfProjectSubmissions.BuildList();
+					ViewOfProjectSubmissions.UpdateDoTheyLikeMe(SelectedGUID);
 				}
 
 
@@ -526,7 +564,7 @@ namespace MefAddIns
 
 			
 			if (SubmissionPanel.Visible == false) {
-				AddAndEditSubmissionPanel.Visible = false;
+				ViewOfProjectSubmissions.Visible = false;
 				SubmissionPanel.Visible = true;
 				ToggleBetweenListAndEditSubmissions.Tag = 0;
 
@@ -535,8 +573,8 @@ namespace MefAddIns
 					SubmissionPanel.Visible = false;
 					ToggleBetweenListAndEditSubmissions.Tag = 1;
 					// we create the SubmissionPanel
-					AddAndEditSubmissionPanel.Visible = true;
-					AddAndEditSubmissionPanel.BuildList ();
+					ViewOfProjectSubmissions.Visible = true;
+					ViewOfProjectSubmissions.BuildList ();
 				//	AddAndEditSubmissionPanel.SetToNewProject (SubmissionPanel.GetSelectedGUID, SubmissionPanel.GetSelectedNAME);
 
 				}

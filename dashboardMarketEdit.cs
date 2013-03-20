@@ -123,6 +123,18 @@ namespace Submissions
 			Count.Text = ViewOfTheData.Count.ToString();
 		}
 
+		public bool WordsOver (string selectedGUID)
+		{
+			Market temp = this.SelectedMarketAsObject ();
+			if (Constants.BLANK != selectedGUID) {
+				int Words = MasterOfLayouts.GetWordsFromGuid (selectedGUID);
+				if (temp.MinimumWord > Words || temp.MaximumWord < Words) {
+					return true;
+				}
+			}
+			return false;
+		}
+
 		public dashboardMarketEdit (DataTable _dataSource, Action<string, string> _UpdateSelectedMarket)
 		{
 			if (null == _dataSource) throw new Exception("invalid data source passed in");
@@ -134,6 +146,11 @@ namespace Submissions
 		//	NewMessage.Show ("boo");
 			ListOfMarkets = new ListBox();
 		
+
+			if (_dataSource.PrimaryKey.Length == 0) {
+				_dataSource.PrimaryKey = new DataColumn[] { _dataSource.Columns ["Guid"] };
+			}
+
 
 			 ViewOfTheData = new DataView(_dataSource);
 			ViewOfTheData.Sort = "Caption ASC";
@@ -316,13 +333,19 @@ namespace Submissions
 		public static void EditMarketRow (PropertyInfo[] properties, DataTable dt, Object o, string guid)
 		{
 			DataRow[] FoundRows = null;
+
+
+
 			// looks for guid and overrides that object
 			FoundRows = dt.Select (String.Format ("Guid='{0}'", guid));
 			if (FoundRows != null && FoundRows.Length > 0) {
+				FoundRows[0].BeginEdit();
 				foreach(PropertyInfo pi in properties)
 				{
+
 					FoundRows[0][pi.Name] = pi.GetValue(o, null);
 				}
+				FoundRows[0].EndEdit();
 			//	dt.Rows.Edit(FoundRows[0]);
 				//dt.Rows.Add(FoundRows[0]); 
 			}

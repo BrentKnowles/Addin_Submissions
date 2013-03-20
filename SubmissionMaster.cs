@@ -24,15 +24,38 @@ namespace Submissions
 		public const string CODE_FEEDBACK3 ="3";
 		public const string CODE_FEEDBACK4 ="4";
 
+		public static void GetMarketDetailsForWarnings (string selectedMarketGuid, string projectGuid, out bool MarketAvailable, out bool ProjectSendHereBefore)
+		{
+			List<Transactions.TransactionSubmission> submissions = GetListOfSubmissionsForMarket (selectedMarketGuid);
+			MarketAvailable = true;
+			ProjectSendHereBefore = false;
+
+
+
+			foreach (TransactionSubmission submission in submissions) {
+				if (ThisSubmissionNotResolved(submission) == true)
+				{
+					// means we are busy
+					MarketAvailable = false;
+				}
+				if (submission.ProjectGUID == projectGuid)
+				{
+					ProjectSendHereBefore = true;
+				}
+			}
+
+		}
+
+
 
 		public static List<Transactions.TransactionBase> GetListOfSubmissionsForProject(string ProjectGUID)
 		{
-			return LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid (ProjectGUID,String.Format (" and type='{0}' ", TransactionsTable.T_SUBMISSION));
+			return LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid (ProjectGUID,String.Format (" and {1}='{0}' ", TransactionsTable.T_SUBMISSION, TransactionsTable.TYPE));
 		}
 
 		public static List<TransactionBase> GetListOfDestinationsForProject (string projectGUID)
 		{
-			return LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid (projectGUID,String.Format (" and type='{0}' ", TransactionsTable.T_SUBMISSION_DESTINATION));
+			return LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid (projectGUID,String.Format (" and {1}='{0}' ", TransactionsTable.T_SUBMISSION_DESTINATION, TransactionsTable.TYPE));
 		}
 
 		public static List<Transactions.TransactionSubmission> GetListOfSubmissionsForMarket (string mARKET_GUID)
@@ -73,10 +96,10 @@ namespace Submissions
 
 		public static List<Transactions.TransactionBase> GetListOfSubmissionsAll()
 		{
-			return LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid ("*",String.Format (" and type='{0}' ", TransactionsTable.T_SUBMISSION));
+			return LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid ("*",String.Format (" and {0}='{1}' ",TransactionsTable.TYPE, TransactionsTable.T_SUBMISSION));
 		}
 
-
+		// the first row for populating fields
 		public static string GetDefaultSubmission ()
 		{
 			List<string> result = LayoutDetails.Instance.CurrentLayout.GetListOfStringsFromSystemTable (TABLE_SubmissionTypes, 1,Constants.BLANK, false);
@@ -100,6 +123,22 @@ namespace Submissions
 				return result [0];
 			}
 			return Constants.ERROR;
+		}
+
+		// If list is EMPTY then this Project is AVAILABLE
+		public static List<TransactionBase> GetListOfOutstandingSubmissionsOrAcceptances (string PROJECT_GUID, string querywrapper)
+		{
+			// grab list of valid "no replies"
+		//	List<string> result = LayoutDetails.Instance.CurrentLayout.GetListOfStringsFromSystemTable (TABLE_ReplyTypes, 1, String.Format ("1|{0}", CODE_NO_REPLY_YET));
+
+			// build query list
+
+
+
+
+			//lg.Instance.Line ("SubmissionMaster->GetListOfOUtstandingSubmissions", ProblemType.MESSAGE, querywrapper);
+			List<Transactions.TransactionBase> transactions = LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid (PROJECT_GUID, querywrapper);
+			return transactions;
 		}
 
 		public static void ChangeToSubmission (TransactionSubmissionDestination Current)
@@ -206,8 +245,16 @@ namespace Submissions
 			return false;
 		}
 
-
-		public static bool HasNoReply_Submission (TransactionSubmission Sub)
+		/// <summary>
+		/// Determines if has no reply_ submission the specified Sub.
+		/// </summary>
+		/// <returns>
+		/// <c>true</c> if has no reply_ submission the specified Sub; otherwise, <c>false</c>.
+		/// </returns>
+		/// <param name='Sub'>
+		/// Sub.
+		/// </param>
+		public static bool ThisSubmissionNotResolved (TransactionSubmission Sub)
 		{    
 			//if (dr[Data.SubmissionIndexFields.REPLYTYPE].ToString().ToLower()
 			//                        == English.Invalid.ToLower() &&

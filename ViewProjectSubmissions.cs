@@ -290,9 +290,12 @@ namespace MefAddIns
 
 			
 		}
+		// this is set during UpdateDoTheyLikeme
+		public bool Available = true;
 
 		public void BuildList ()
 		{
+
 			if (null == LayoutDetails.Instance.TransactionsList) {
 				throw new Exception("Transaction Table not created yet");
 			}
@@ -301,6 +304,10 @@ namespace MefAddIns
 				{
 				
 					List<Transactions.TransactionBase> LayoutEvents = SubmissionMaster.GetListOfSubmissionsForProject(ProjectGUID);
+
+		
+
+
 					UpdateListBox (LayoutEvents, ListOfSubs);
 					Count.Text = Loc.Instance.GetStringFmt("Submissions: {0}", ListOfSubs.Items.Count.ToString ());
 					LayoutEvents = null;
@@ -322,9 +329,23 @@ namespace MefAddIns
 		/// </summary>
 		public void UpdateDoTheyLikeMe(string guid)
 		{
+			Available = true;
 			// count number of personal
 			try
 			{
+				if (guid != Constants.BLANK)
+				{
+				List<Transactions.TransactionBase> LayoutEvents = SubmissionMaster.GetListOfSubmissionsForProject(guid);
+				
+				// when we grab the list we do some math for the Warnings Label on the main form
+				foreach (Transactions.TransactionBase submission in LayoutEvents)
+				{
+					if (SubmissionMaster.ThisSubmissionNotResolved((Transactions.TransactionSubmission)submission) == true)
+					{
+						Available = false;
+						break;
+					}
+				}
 				//	DataTable OurTable = SubmissionDataView.ToTable();
 				//	if (null == OurTable) return; // trying to get rid of Index error Sep 26 2012
 				
@@ -395,6 +416,7 @@ namespace MefAddIns
 				//				{
 				//					labelhowellisitdoing.Text = String.Format("Overall this submission has had {0} responses from potential markets and has earned ${1}", sLabel, fEarned.ToString());
 				//				}
+				}
 			}
 			catch (Exception ex)
 			{

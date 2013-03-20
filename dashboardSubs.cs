@@ -9,6 +9,7 @@ using System.Collections;
 using CoreUtilities;
 using Submissions;
 using Layout;
+using Transactions;
 
 namespace MefAddIns
 {
@@ -122,12 +123,10 @@ namespace MefAddIns
 			return Sub;
 		}
 
-		void AddItemsFromCurrentFilter (bool AddSubmissionInformation)
+		void AddItemsSubMethod (List<MasterOfLayouts.NameAndGuid> list, bool AddSubmissionInformation)
 		{
 			ArrayList submissions = new ArrayList ();
-			//TODO: Will eventually allow user to store preferred filter
-			List<MasterOfLayouts.NameAndGuid> LayoutsFound = MasterOfLayouts.GetListOfLayouts (CurrentFilter);
-			foreach (MasterOfLayouts.NameAndGuid NameG in LayoutsFound) {
+			foreach (MasterOfLayouts.NameAndGuid NameG in list) {
 				LittleSubmission sub = new LittleSubmission ();
 				sub.Story = NameG.Caption;
 				sub.GUID = NameG.Guid;
@@ -137,16 +136,25 @@ namespace MefAddIns
 				
 				
 				// grab Current Submission information for those on this filter
-
+				
 				if (true == AddSubmissionInformation)
 				{
-				sub = AddSubmissionInformationToCurrentFilterItem (sub);
+					sub = AddSubmissionInformationToCurrentFilterItem (sub);
 				}
 				
 				submissions.Add (sub);
 			}
 			//NewMessage.Show("Adding : " + submissions.Count.ToString ());
 			AddItemToListView (submissions);
+		}
+
+		void AddItemsFromCurrentFilter (bool AddSubmissionInformation)
+		{
+
+
+			List<MasterOfLayouts.NameAndGuid> LayoutsFound = MasterOfLayouts.GetListOfLayouts (CurrentFilter);
+
+			AddItemsSubMethod(LayoutsFound, AddSubmissionInformation);
 		}
 
 		private LittleSubmission AddSubmissionInformationToCurrentFilterItem (LittleSubmission CurrentItem)
@@ -162,8 +170,10 @@ namespace MefAddIns
 			
 
 					//	filter only those with NO REPLY
-					if (SubmissionMaster.HasNoReply_Submission (subs) == true) {
+					if (SubmissionMaster.ThisSubmissionNotResolved (subs) == true) {
 						AddTransactionRowDetailsToLittleSub(CurrentItem, subs);
+						// added the break because we only care if we find one unanswered sub, right?? (March 17 2013)
+						break;
 
 					}
 				}
@@ -226,7 +236,7 @@ namespace MefAddIns
 			//NewMessage.Show (AllSubs.Count.ToString());
 			foreach (Transactions.TransactionSubmission TransactionSub in AllSubs)
 			{
-				if (SubmissionMaster.HasNoReply_Submission(TransactionSub) == true)
+				if (SubmissionMaster.ThisSubmissionNotResolved(TransactionSub) == true)
 				{
 					LittleSubmission sub = new LittleSubmission ();
 					sub.Story = MasterOfLayouts.GetNameFromGuid(TransactionSub.ProjectGUID);
@@ -382,44 +392,114 @@ namespace MefAddIns
 			try {
 				ArrayList submissions = new ArrayList ();
 
-
+				listView1.BeginUpdate();
 				//Step 1: Use current Filter and REMOVE those entities that
 				//        are currently at Markets
 
-				AddItemsFromCurrentFilter(false);
-				List<ListViewItem> ItemsToRemove = new List<ListViewItem>();
+			//	AddItemsFromCurrentFilter(false); *
+
+				List<MasterOfLayouts.NameAndGuid> ItemsToKeep = new List<MasterOfLayouts.NameAndGuid>();
 		
-				foreach (ListViewItem item in listView1.Items)
+
+				List<MasterOfLayouts.NameAndGuid> LayoutsFound = MasterOfLayouts.GetListOfLayouts (CurrentFilter);
+
+
+				// THIS IS the SLOW PART.
+				// 10 seconds + 
+
+				// really we want the list of Transactions that contain ReplyType=Acceptance or ReplyType=Invalid
+				// if this list is greater than 0 than we have a match
+				List<string> OutstandingReply = LayoutDetails.Instance.CurrentLayout.GetListOfStringsFromSystemTable (SubmissionMaster.TABLE_ReplyTypes, 1, String.Format ("2|{0}", SubmissionMaster.CODE_NO_REPLY_YET));
+				List<string> Acceptances = LayoutDetails.Instance.CurrentLayout.GetListOfStringsFromSystemTable (SubmissionMaster.TABLE_ReplyTypes, 1, String.Format ("2|{0}", SubmissionMaster.CODE_ACCEPTANCE));
+				string query = "";
+				
+				foreach (string s in OutstandingReply) {
+					
+					if (query != "") query = query + " or ";
+					query = query + String.Format (" {1}='{0}' ", s, TransactionsTable.DATA7);
+				}
+				
+				
+				foreach (string s in Acceptances) {
+					
+					if (query != "") query = query + " or ";
+					query = query + String.Format (" {1}='{0}' ", s, TransactionsTable.DATA7);
+				}
+				
+				string querywrapper = String.Format ("and {1}='{2}' and ({0})", query, TransactionsTable.TYPE, TransactionsTable.T_SUBMISSION);
+
+			//	foreach (ListViewItem item in listView1.Items)
+				foreach (MasterOfLayouts.NameAndGuid item in LayoutsFound)
 				{
-					LittleSubmission Sub = (LittleSubmission) item.Tag;
-					if (Sub != null)
+				//	LittleSubmission Sub = (LittleSubmission) item.Tag;
+				//	if (Sub != null)
 					{
-						List<Transactions.TransactionBase> ListOfSubs = SubmissionMaster.GetListOfSubmissionsForProject(Sub.GUID);
-						if (ListOfSubs != null && ListOfSubs.Count > 0)
+						if (OutstandingReply == null || OutstandingReply.Count <= 0 || Acceptances == null || Acceptances.Count <=0)
 						{
+							throw new Exception("Default lists not defined.");
+						}
+
+
+
+
+						List<Transactions.TransactionBase> ListOfSubs = SubmissionMaster.GetListOfOutstandingSubmissionsOrAcceptances(item.Guid, querywrapper);
+
+						// we found no Acceptances and no invalid replies which mean we are free to SEND
+						if (ListOfSubs.Count == 0)
+						{
+							ItemsToKeep.Add (item);
+						}
+						/*
+
+						List<Transactions.TransactionBase> ListOfSubs = SubmissionMaster.GetListOfSubmissionsForProject(item.Guid);
+						if (ListOfSubs != null && ListOfSubs.Count > 0)
+						{bool FoundAtLeastOneSub = false;
 							foreach(Transactions.TransactionBase transaction in ListOfSubs)
 							{
 								if (transaction is Transactions.TransactionSubmission)
 								{
+
 									if (SubmissionMaster.IsValidReply( ((Transactions.TransactionSubmission)transaction).ReplyType) == false)
 								{
 									//	NewMessage.Show ("Removing " + item.Text);
 									// if there are oustanding submissions
 									// for this project
 									// remove it from the list of Ready To send
-										ItemsToRemove.Add (item);
+									//	ItemsToRemove.Add (item); *
+										FoundAtLeastOneSub = true;
 								}
+									if (SubmissionMaster.IsAcceptance( ((Transactions.TransactionSubmission)transaction).ReplyType) == true)
+									{
+										FoundAtLeastOneSub = true;
+									}
+
+
+									if (true == FoundAtLeastOneSub)
+									{
+										break;
+									}
+
 							}
+							}
+
+							if (false == FoundAtLeastOneSub)
+							{
+								ItemsToKeep.Add (item);
 							}
 						}
+						*/
 					}
 				}
-				foreach (ListViewItem DeleteMe in ItemsToRemove)
-				{
-					listView1.Items.Remove (DeleteMe);
-				}
+//				foreach (ListViewItem DeleteMe in ItemsToRemove)
+//				{
+//					listView1.Items.Remove (DeleteMe);
+//				}
 
 
+				// I flipped the logic to make this fstaer (march 17 2013)
+				//   so: we now add them
+				AddItemsSubMethod(ItemsToKeep, false);
+				listView1.EndUpdate();
 				// STOP: March 2013. Maybe I do not need to make this mor ecomplicated.
 				// Can I solve it witht he right query?
 				// i.e., notebook='Writing' and status='4 Complete' and section='Projects'
@@ -444,7 +524,7 @@ namespace MefAddIns
 //
 //                }
 //                dv = null;
-				AddItemToListView (submissions);
+			//	AddItemToListView (submissions);
 				/*
                 foreach (LittleSubmission sub in submissions)
                 {

@@ -87,11 +87,7 @@ namespace MefAddIns
 		public override void RegisterType ()
 		{
 
-			//TODO: Create custom tables
-			//TODO: need to hook up PublishTyleLIstConverter and MarketTYpeListOnverter
-			if (false) {
-
-			}
+		
 
 			//LayoutDetails.Instance.AddMarkupToList(new iMarkupYourOtherMind());
 			//NewMessage.Show ("Registering Picture");
