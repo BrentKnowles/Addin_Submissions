@@ -22,6 +22,8 @@ namespace Submissions
 		Button AddMarket = null;
 		Button EditMarket = null;	
 		Button EditMarketCancel = null;
+		Label SubLabel = null;
+		Label DestLabel = null;
 #endregion
 
 		// take the currently selected ROW and return a valid object
@@ -185,10 +187,10 @@ namespace Submissions
 			Tabs.SelectedIndexChanged+= HandleMiniTabSelectedIndexChanged;
 		
 
-			Label SubLabel = new Label();
+			SubLabel = new Label();
 			SubLabel.Text = Loc.Instance.GetString ("Submissions");
 			SubLabel.Dock = DockStyle.Top;
-			Label DestLabel = new Label();
+			DestLabel = new Label();
 			DestLabel.Dock = DockStyle.Bottom;
 			DestLabel.Text = Loc.Instance.GetString("Destinations");
 
@@ -429,7 +431,9 @@ namespace Submissions
 				{
 
 					BuildListForListBox(PreviousSubmissions, SubmissionMaster.GetListOfSubmissionsForMarket(MARKET_GUID));
+					SubLabel.Text = Loc.Instance.GetStringFmt("Submissions ({0})", PreviousSubmissions.Items.Count);
 					BuildListForListBox(Destinations, SubmissionMaster.GetListOfDestinationsForMarket(MARKET_GUID));
+					DestLabel.Text =Loc.Instance.GetStringFmt("Destinations ({0})", Destinations.Items.Count);
 				
 				}
 			} catch (Exception ex) {

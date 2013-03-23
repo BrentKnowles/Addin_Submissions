@@ -20,8 +20,8 @@ namespace Submissions
 			SubEditPanel = new SubmissionEditPanel(ProvideDefaults);
 			SubEditPanel.Dock = DockStyle.Fill;
 			this.Controls.Add (SubEditPanel);
-			this.Width = 1050;
-			this.Height = 800;
+			this.Width = 1075;
+			this.Height = 850;
 			this.Icon = LayoutDetails.Instance.MainFormIcon;
 			FormUtils.SizeFormsForAccessibility(this, LayoutDetails.Instance.MainFormFontSize);
 
