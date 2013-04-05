@@ -1,3 +1,31 @@
+// ViewProjectSubmissions.cs
+//
+// Copyright (c) 2013 Brent Knowles (http://www.brentknowles.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+// Review documentation at http://www.yourothermind.com for updated implementation notes, license updates
+// or other general information/
+// 
+// Author information available at http://www.brentknowles.com or http://www.amazon.com/Brent-Knowles/e/B0035WW7OW
+// Full source code: https://github.com/BrentKnowles/YourOtherMind
+//###
 using System;
 using CoreUtilities;
 using System.Windows.Forms;
@@ -24,6 +52,7 @@ namespace MefAddIns
 			get { return GetProjectGUID();}
 		}
 		public delegate Market getmarketbyguiddelegate(string guid);
+
 		#endregion
 		#region gui
 		ListBox ListOfSubs = null;
@@ -33,20 +62,20 @@ namespace MefAddIns
 		ToolStripButton MakeSubmission = null;
 		ToolStripButton MakeDestination = null;
 		ToolStripButton DeleteSelected = null;
-		ToolStripButton GenerateCoverLetter = null;
+		ToolStripButton GenerateCoverLetter=null;
 		#endregion
 
 		public void SetLabel (string main, string update)
 		{
-			// TODO: main will eventually be the main message
-			// TODO: update on the mouse over
-
-			Overall.Text = update;
+		
+			Overall.Text = main;
+			Overall.Tag = update;
 		}
-
-		public ViewProjectSubmissions(Func<string> _GetProjectGUID, getmarketbyguiddelegate _GetMarketByGUID)
+		LayoutPanelBase myLayout = null;
+		public ViewProjectSubmissions(Func<string> _GetProjectGUID, getmarketbyguiddelegate _GetMarketByGUID, LayoutPanelBase _Layout)
 		{
-
+		
+			myLayout = _Layout;
 			GetProjectGUID = _GetProjectGUID;
 			GetMarketByGUID = _GetMarketByGUID;
 
@@ -54,7 +83,11 @@ namespace MefAddIns
 			Title.Text= "List of Submissions";
 			Title.Dock = DockStyle.Top;
 
+
 			 Overall = new Label();
+
+			Overall.MouseEnter+= HandleMouseEnter;
+			Overall.MouseLeave+= HandleMouseLeave;
 			Overall.Dock = DockStyle.Top;
 			Overall.Text = Loc.Instance.GetString ("OVERALL DETAILS TBD");
 
@@ -117,6 +150,21 @@ namespace MefAddIns
 
 		}
 
+		void HandleMouseLeave (object sender, EventArgs e)
+		{
+			(sender as Label).Text = textmemory;
+		}
+
+		void HandleMouseEnter (object sender, EventArgs e)
+		{
+			if ((sender as Label).Tag != null) {
+				textmemory = (sender as Label).Text;
+				(sender as Label).Text = (sender as Label).Tag.ToString (); 
+			}
+		}
+		string textmemory ="";
+
+
 		void HandleDestinationsClick (object sender, EventArgs e)
 		{
 			MakeDestination.Enabled = false;
@@ -155,9 +203,94 @@ namespace MefAddIns
 			ChangeToDestination();
 		}
 
+		/// <summary>
+		/// Generate_s the cover letter.
+		/// 
+		/// Looks for a text note named "cover letter"
+		/// 
+		/// Fills in the appropriate details
+		/// MARKET details
+		/// [MarketName]
+		//		[Address]
+		//		[City], [Province]
+		//		[PostalCode]
+		//		[Country]
+		//      [Editor]
+		//
+		// PROJECT DETAILS
+		// [Page]
+		// [Words]
+		/// </summary>
+		void Generate_CoverLetter ()
+		{
+			if (ListOfSubs.SelectedItem != null && ProjectGUID != Constants.BLANK && LayoutDetails.Instance.CurrentLayout != null) {
+				// find the cover to use and get text from it
+
+				string covernote = Constants.BLANK;
+				NoteDataXML_RichText TextNote = (NoteDataXML_RichText)LayoutDetails.Instance.CurrentLayout.FindNoteByName("Cover Letter");
+				if (TextNote != null)
+				{
+				covernote = TextNote.GetRichTextBox().Rtf;
+
+
+				TransactionSubmission Submission = (TransactionSubmission)ListOfSubs.SelectedItem;
+				string marketguid = Submission.MarketGuid;
+	
+				Market market = GetMarketByGUID(marketguid);
+				if (market != null)
+				{
+				MasterOfLayouts.NameAndGuid project = new MasterOfLayouts.NameAndGuid ();
+				project.Guid = ProjectGUID;
+					project.Caption = MasterOfLayouts.GetNameFromGuid(ProjectGUID);
+				project.Words = MasterOfLayouts.GetWordsFromGuid(ProjectGUID);
+
+
+
+				if (market != null) {
+					try {
+						// load it into a temporary richtext that we destroy
+						// copy it and paste it into the rich edit?
+								string sOutput = TextUtils.RegExternalStr_ObjectLookup (covernote,  market,project, null);
+						// sOutput = DocGen.RegExternalStr_ObjectLookup(sOutput, market);
+						//sOutput = DocGen.RegExternalStr_ObjectLookup(sOutput, info);
+
+
+						try {
+							//	richText.Rtf = temp.Rtf;
+									GenericTextForm Report = LayoutDetails.Instance.GetTextFormToUse();
+									Report.GetRichTextBox().Rtf = sOutput;
+									Report.ShowDialog();
+							/*temp.SelectAll();
+                                temp.Copy();
+                                richText.ReadOnly = false;
+                                richText.Focus();
+                                // richText.Rtf = richText.Rtf + "\n";
+                                richText.Paste();*/
+						} catch (Exception ex) {
+							NewMessage.Show (ex.ToString ());
+						}
+					} catch (Exception ex) {
+							NewMessage.Show (ex.ToString());
+						// if user info has not had valid data entered for USERINFO then
+						// we can't output a letter
+						//richText.Text = Loc.Instance.GetString ("error");
+					}
+				} else {
+					lg.Instance.Line ("ViewProjectSubmissions->GenerateCoverLetter", ProblemType.WARNING, "error generating cover letter");
+				}
+					}	// market not null
+				}
+				else
+				{
+					NewMessage.Show (Loc.Instance.GetString ("You cannot generate a cover letter unless you have a text note named Cover Letter on this layout."));
+				}
+			} 
+
+		}
+
 		void HandleGenerateCoverLetterClick (object sender, EventArgs e)
 		{
-			NewMessage.Show ("move repalcement text system over");
+			Generate_CoverLetter();
 		}
 
 		void HandleDeleteSubmissionClick (object sender, EventArgs e)
@@ -373,31 +506,46 @@ namespace MefAddIns
 				}
 				
 				// count sales and add
-				//				string sFilter2 = String.Format("{0} = '{1}'", Data.SubmissionIndexFields.REPLYTYPE, classSubmission.DEFAULT_ACCEPTANCE);
-				//				int nCount = 0;
-				//				nCount = (int)OurTable.Compute(String.Format("COUNT({0})", Data.SubmissionIndexFields.REPLYFEEDBACK), sFilter2);
+							//	string sFilter2 = String.Format("{0} = '{1}'", Data.SubmissionIndexFields.REPLYTYPE, classSubmission.DEFAULT_ACCEPTANCE);
+								int nCount = 0;
+
+					if (ProjectGUID != Constants.BLANK)
+					{
+								nCount = SubmissionMaster.CountAcceptances(myLayout, ProjectGUID);
+					}
+							//	nCount = (int)OurTable.Compute(String.Format("COUNT({0})", Data.SubmissionIndexFields.REPLYFEEDBACK), sFilter2);
 				//				
-				//				nTotalPoints += (nCount*10);
-				//				
-				//				string sLabel = "neutral";
-				//				if (nTotalPoints <= 0) sLabel = "neutral";
-				//				
-				//				else if (nTotalPoints < 3) sLabel = "personal";
-				//				else if (nTotalPoints <= 5) sLabel = "encouraging";
-				//				else if (nTotalPoints <= 10) sLabel = "strong";
-				//				else if (nTotalPoints > 10) sLabel = "exceptional";
+								nTotalPoints += (nCount*10);
+								
+								string sLabel = "neutral";
+								if (nTotalPoints <= 0) sLabel = "neutral";
+								
+								else if (nTotalPoints < 3) sLabel = "personal";
+								else if (nTotalPoints <= 5) sLabel = "encouraging";
+								else if (nTotalPoints <= 10) sLabel = "strong";
+								else if (nTotalPoints > 10) sLabel = "exceptional";
 				//				
 				string HistoryOfFeedback = String.Format("{0}: {1}, {2}: {3}, {4}: {5}, {6}: {7}", sList[0], nHistory[0],
 				                                         sList[1], nHistory[1], sList[2], nHistory[2], sList[3], nHistory[3]);
 				
-				SetLabel("Main", HistoryOfFeedback);
+			
 				//NewMessage.Show (HistoryOfFeedback);
 				sList = null; nPoints = null;
 				
 				// March 2009
 				// Also figuring out how much money was made/lost on this submission
-				//				float fEarned = 0;
-				//				float fSpent = 0;
+								float fEarned = 0;
+								float fSpent = 0;
+
+
+
+					if (Constants.BLANK != ProjectGUID)
+					{
+						string SumFilter = String.Format (" {0}='{1}' and {2}='{3}'", TransactionsTable.DATA1_LAYOUTGUID, ProjectGUID
+						                                  ,TransactionsTable.TYPE, TransactionsTable.T_SUBMISSION);
+						fEarned = LayoutDetails.Instance.TransactionsList.Sum(ProjectGUID, TransactionsTable.MONEY2, SumFilter);
+						fSpent = LayoutDetails.Instance.TransactionsList.Sum(ProjectGUID, TransactionsTable.MONEY1, SumFilter);
+					}
 				//				try
 				//				{
 				//					fSpent = (float)OurTable.Compute(String.Format("SUM({0})", Data.SubmissionIndexFields.EXPENSES), "");
@@ -407,15 +555,16 @@ namespace MefAddIns
 				//				{
 				//					// we ignore this exception because you might get NULL rows
 				//				}
-				//				fEarned = (float)Math.Round( (double)(fEarned - fSpent), 2);
+								fEarned = (float)Math.Round( (double)(fEarned - fSpent), 2);
 				//				
 				//				
 				//				
 				//				
 				//		
 				//				{
-				//					labelhowellisitdoing.Text = String.Format("Overall this submission has had {0} responses from potential markets and has earned ${1}", sLabel, fEarned.ToString());
+								string main	 = String.Format("Overall this submission has had {0} responses from potential markets and has earned ${1}", sLabel, fEarned.ToString());
 				//				}
+					SetLabel(main, HistoryOfFeedback);
 				}
 			}
 			catch (Exception ex)

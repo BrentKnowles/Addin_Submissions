@@ -71,7 +71,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="mef_Addin_Submissions.cs" />
-    <Compile Include="NoteDataXML_Market.cs" />
     <Compile Include="PublishTypeListConverter.cs" />
     <Compile Include="MarketTypeListConverter.cs" />
     <Compile Include="dashboardSubs.cs" />

@@ -1,3 +1,31 @@
+// mef_Addin_Submissions.cs
+//
+// Copyright (c) 2013 Brent Knowles (http://www.brentknowles.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+// Review documentation at http://www.yourothermind.com for updated implementation notes, license updates
+// or other general information/
+// 
+// Author information available at http://www.brentknowles.com or http://www.amazon.com/Brent-Knowles/e/B0035WW7OW
+// Full source code: https://github.com/BrentKnowles/YourOtherMind
+//###
 namespace MefAddIns
 {
 	using MefAddIns.Extensibility;
@@ -36,7 +64,9 @@ namespace MefAddIns
 		}
 		public string Version
 		{
-			get { return @"1.0.0.0"; }
+			// version history
+			// 1.2 - remove destination from default submission type table becaues end users to do not need it
+			get { return @"1.2.0.0"; }
 		}
 		public string Description
 		{
@@ -91,31 +121,31 @@ namespace MefAddIns
 
 			//LayoutDetails.Instance.AddMarkupToList(new iMarkupYourOtherMind());
 			//NewMessage.Show ("Registering Picture");
-			Layout.LayoutDetails.Instance.AddToList(typeof(NoteDataXML_Market), Loc.Instance.GetString ("Market (ADDIN- YomSub)"));
+		//	Layout.LayoutDetails.Instance.AddToList(typeof(NoteDataXML_Market), Loc.Instance.GetString ("Market (ADDIN- YomSub)"));
 			Layout.LayoutDetails.Instance.AddToList(typeof(NoteDataXML_Submissions), Loc.Instance.GetString ("Submissions (ADDIN- YomSub)"));
 		}
 
 		void TMP_BuildTestingPage ()
 		{
-			if (LayoutDetails.Instance.CurrentLayout != null) {
-				LayoutPanels.NoteDataXML_Panel NewPanel = new NoteDataXML_Panel();
-			
-				NewPanel.GuidForNote = "NewPanelB";
-				NewPanel.Caption = "Market Panel  BBBB";
-
-				LayoutDetails.Instance.CurrentLayout.AddNote (NewPanel);
-				NewPanel.GetPanelsLayout().ShowTabs = false;
-				for (int i = 0; i < 200; i++)
-				{
-					NoteDataXML_Market Market = new NoteDataXML_Market(300,300);
-					Market.Caption = "Market " + i.ToString();
-					Market.GuidForNote = "market " + i.ToString();
-					NewPanel.AddNote(Market);
-					//Market.CreateParent(NewPanel.GetPanelsLayout());
-				}
-				NewPanel.Save ();
-				LayoutDetails.Instance.CurrentLayout.SaveLayout ();
-			}
+//			if (LayoutDetails.Instance.CurrentLayout != null) {
+//				LayoutPanels.NoteDataXML_Panel NewPanel = new NoteDataXML_Panel();
+//			
+//				NewPanel.GuidForNote = "NewPanelB";
+//				NewPanel.Caption = "Market Panel  BBBB";
+//
+//				LayoutDetails.Instance.CurrentLayout.AddNote (NewPanel);
+//				NewPanel.GetPanelsLayout().ShowTabs = false;
+//				for (int i = 0; i < 200; i++)
+//				{
+//				//	NoteDataXML_Market Market = new NoteDataXML_Market(300,300);
+//					Market.Caption = "Market " + i.ToString();
+//					Market.GuidForNote = "market " + i.ToString();
+//					NewPanel.AddNote(Market);
+//					//Market.CreateParent(NewPanel.GetPanelsLayout());
+//				}
+//				NewPanel.Save ();
+//				LayoutDetails.Instance.CurrentLayout.SaveLayout ();
+//			}
 
 		}
 		public void TMP_FindAllMarketsWithCriteria ()
@@ -123,22 +153,22 @@ namespace MefAddIns
 
 
 
-			ArrayList notes = LayoutDetails.Instance.CurrentLayout.GetAllNotes ();
-			int Found = 0;
-			List<NoteDataXML_Market> FoundM = new List<NoteDataXML_Market>();
-			foreach (NoteDataInterface note in notes) {
-				if (note is NoteDataXML_Market)
-				{
-					if ((note as NoteDataXML_Market).MinimumWord > 0 && (note as NoteDataXML_Market).MaximumWord < 7000 )
-					{
-						Found++;
-						FoundM.Add ((NoteDataXML_Market)note);
-					}
-				}
-			}
+//			ArrayList notes = LayoutDetails.Instance.CurrentLayout.GetAllNotes ();
+//			int Found = 0;
+//			List<NoteDataXML_Market> FoundM = new List<NoteDataXML_Market>();
+//			foreach (NoteDataInterface note in notes) {
+//				if (note is NoteDataXML_Market)
+//				{
+//					if ((note as NoteDataXML_Market).MinimumWord > 0 && (note as NoteDataXML_Market).MaximumWord < 7000 )
+//					{
+//						Found++;
+//						FoundM.Add ((NoteDataXML_Market)note);
+//					}
+//				}
+//			}
 
 
-			NewMessage.Show (Found.ToString ());
+			//NewMessage.Show (Found.ToString ());
 		}
 		public void TMP_FindAllMarketsWithCriteria_USING_A_TABLE_INSTEAD ()
 		{
@@ -257,11 +287,11 @@ namespace MefAddIns
 			{
 				PlugInAction action = new PlugInAction();
 				//	action.HotkeyNumber = -1;
-				action.MyMenuName = "TMP - Add testing notes";//Loc.Instance.GetString ("Screen Capture");
+				action.MyMenuName = "*error";//Loc.Instance.GetString ("Screen Capture");
 				action.ParentMenuName = "NotesMenu";//"NotesMenu";
 				action.IsOnContextStrip = false;
 				action.IsANote = true;
-				action.IsOnAMenu = true;
+				action.IsOnAMenu = false;
 				action.IsNoteAction = false;
 				action.QuickLinkShows = false;
 				action.ToolTip ="";//Loc.Instance.GetString("Allows images to be added to Layouts, as well as a Screen Capture tool.");

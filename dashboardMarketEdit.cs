@@ -1,3 +1,31 @@
+// dashboardMarketEdit.cs
+//
+// Copyright (c) 2013 Brent Knowles (http://www.brentknowles.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+// Review documentation at http://www.yourothermind.com for updated implementation notes, license updates
+// or other general information/
+// 
+// Author information available at http://www.brentknowles.com or http://www.amazon.com/Brent-Knowles/e/B0035WW7OW
+// Full source code: https://github.com/BrentKnowles/YourOtherMind
+//###
 using System;
 using System.Windows.Forms;
 using System.Data;
@@ -14,6 +42,8 @@ namespace Submissions
 
 		#region variables
 		string MARKET_GUID= Constants.BLANK;
+		string ProjectGUID = Constants.BLANK;
+		int ProjectWords = 0;
 		#endregion
 		#region gui
 		PropertyGrid tmpEditor = null;
@@ -24,8 +54,26 @@ namespace Submissions
 		Button EditMarketCancel = null;
 		Label SubLabel = null;
 		Label DestLabel = null;
-#endregion
+		RichTextBox richBox = null;
 
+		ListBox ListOfMarkets = null;
+		GroupBox MarketFilters = null;
+		CheckBox WordBox = null;
+		CheckBox RetiredCheck = null;
+		CheckBox HideAlreadySentCheck = null;
+		CheckBox HideOccupiedCheck = null;
+
+		ComboBox PublishingTypeBox = null;
+		ComboBox MarketTypeBox = null;
+
+		DataView ViewOfTheData = null;
+		Label Count = null;
+#endregion
+		#region delegates
+		Action<string, string> UpdateSelectedMarket=null;
+		//	Func<int> GetProjectWords=null;
+		//	Func<string> GetProjectGUID=null;
+#endregion
 		// take the currently selected ROW and return a valid object
 		public Market SelectedMarketAsObject ()
 		{
@@ -63,42 +111,86 @@ namespace Submissions
 			// clear selection to force a refresh (user has to select a market
 			ListOfMarkets.SelectedIndex = -1;
 		}
-		#region variables
-		string ProjectGUID = Constants.BLANK;
-		int ProjectWords = 0;
-		#endregion
-		#region delegates
-		Action<string, string> UpdateSelectedMarket=null;
-	//	Func<int> GetProjectWords=null;
-	//	Func<string> GetProjectGUID=null;
-		#endregion
-		#region gui
-		ListBox ListOfMarkets = null;
-		GroupBox MarketFilters = null;
-		CheckBox WordBox = null;
-		DataView ViewOfTheData = null;
-		Label Count = null;
-		#endregion
+
 
 		GroupBox BuildMarketFilterBox ()
 		{
-			GroupBox _MarketFilters =	new GroupBox();
+			GroupBox _MarketFilters = new GroupBox ();
 			_MarketFilters.Text = Loc.Instance.GetString ("Filters");
 			_MarketFilters.Dock = DockStyle.Bottom;
 			_MarketFilters.Width = 200;
-			_MarketFilters.Height = 150;
+			_MarketFilters.Height = 200;
 
-			Count = new Label();
+			Count = new Label ();
 			Count.Text = "0";
 			Count.Dock = DockStyle.Top;
 
-		    WordBox = new CheckBox();
+			WordBox = new CheckBox ();
+			WordBox.Checked = false;
 			WordBox.Dock = DockStyle.Top;
-			WordBox.Text =  Loc.Instance.GetString("By Words: <select a project>");
+			WordBox.Click += HandleOptionClick;
+			WordBox.Text = Loc.Instance.GetString ("By Words: <project>");
 
+
+			RetiredCheck = new CheckBox ();
+			RetiredCheck.Dock = DockStyle.Top;
+			RetiredCheck.Checked = false;
+			RetiredCheck.Click += HandleOptionClick;
+			RetiredCheck.Text = Loc.Instance.GetString ("Show Retired");
+
+
+			HideAlreadySentCheck = new CheckBox ();
+			HideAlreadySentCheck.Dock = DockStyle.Top;
+			HideAlreadySentCheck.Checked = true;
+			HideAlreadySentCheck.Click += HandleOptionClick;
+			HideAlreadySentCheck.Text = Loc.Instance.GetString ("Hide if Sent To Already");
+
+			HideOccupiedCheck = new CheckBox ();
+			HideOccupiedCheck.Dock = DockStyle.Top;
+			HideOccupiedCheck.Checked = true;
+			HideOccupiedCheck.Click += HandleOptionClick;
+			HideOccupiedCheck.Text = Loc.Instance.GetString ("Hide Busy Markets");
+
+
+			PublishingTypeBox = new ComboBox ();
+			PublishingTypeBox.DropDownStyle = ComboBoxStyle.DropDownList;
+			List<string> publishtypes = LayoutDetails.Instance.TableLayout.GetListOfStringsFromSystemTable (LayoutDetails.SYSTEM_PUBLISHTYPES, 1);
+			publishtypes.Add (Constants.BLANK);
+			PublishingTypeBox.Dock = DockStyle.Top;
+			foreach (string s in publishtypes) {
+				PublishingTypeBox.Items.Add (s);
+			}
+			PublishingTypeBox.SelectedIndexChanged+= (object sender, EventArgs e) => UpdateFilter();
+
+
+			MarketTypeBox = new ComboBox ();
+			MarketTypeBox.DropDownStyle = ComboBoxStyle.DropDownList;
+			List<string> markettypes = LayoutDetails.Instance.TableLayout.GetListOfStringsFromSystemTable (LayoutDetails.SYSTEM_MARKETTYPES, 1);
+			markettypes.Add (Constants.BLANK);
+			MarketTypeBox.Dock = DockStyle.Top;
+			foreach (string s in markettypes) {
+				MarketTypeBox.Items.Add (s);
+			}
+			MarketTypeBox.SelectedIndexChanged+= (object sender, EventArgs e) => UpdateFilter();
+
+
+
+
+
+
+			_MarketFilters.Controls.Add (MarketTypeBox);
+			_MarketFilters.Controls.Add (PublishingTypeBox);
+			_MarketFilters.Controls.Add (HideOccupiedCheck);
+			_MarketFilters.Controls.Add (HideAlreadySentCheck);
+			_MarketFilters.Controls.Add (RetiredCheck);
 			_MarketFilters.Controls.Add (WordBox);
 			_MarketFilters.Controls.Add (Count);
 			return _MarketFilters;
+		}
+
+		void HandleOptionClick (object sender, EventArgs e)
+		{
+			UpdateFilter();
 		}
 
 		public void UpdateProjectInformationForFilterBox (string _ProjectGUID, int _ProjectWords)
@@ -109,20 +201,81 @@ namespace Submissions
 			WordBox.Text = Loc.Instance.GetStringFmt("By Words: {0}", ProjectWords);
 			UpdateFilter ();
 		}
-		private string BuildRowFilter()
+		private string BuildRowFilter ()
 		{
+			List<string> ExcludedGuids = new List<string> ();
+
+
+			// FOR BUSY :  TRICK: Build a List of ExcludedGUIDS -- populated by ALreadySentHere and Busy -- queries against the TRANSACTION TABLE
+			// We then generate a list of  And if not guid='anexcludeguide', that gets added to the rowfilter
+			// These will be more exepsnive, either post processing on the list or some kidn of generated field
+			if (true == HideAlreadySentCheck.Checked && Constants.BLANK != ProjectGUID) {
+				List<Transactions.TransactionBase> Submissions = SubmissionMaster.GetListOfSubmissionsForProject (ProjectGUID);
+
+				foreach (Transactions.TransactionSubmission sub in Submissions) {
+					// we add every market sent to, to this list.
+					ExcludedGuids.Add (sub.MarketGuid);
+
+				}
+
+			}
+
+			if (true == HideOccupiedCheck.Checked) {
+				List<string> BusyMarkets = SubmissionMaster.GetListOfGuidsOfBusyMarkets(CurrentLayout);
+				foreach (string s in BusyMarkets)
+				{
+					ExcludedGuids.Add (s);
+				}
+			}
+
 			string filter = "";
-			if (WordBox.Checked == true) filter = String.Format ("MinimumWord <= {0} and MaximumWord >= {0}", ProjectWords);
+			if (true == RetiredCheck.Checked)
+				filter = String.Format ("(Retired=1 or Retired=0)");
+			else
+				filter = String.Format ("Retired=0");
+
+			// because we always put the Retired filter above we KNOW we add any other filters with an And
+			if (PublishingTypeBox.Text != Constants.BLANK) {
+				filter = String.Format ("{0} and PublishType='{1}'", filter, PublishingTypeBox.Text);
+			}
+			if (MarketTypeBox.Text != Constants.BLANK) {
+				filter = String.Format ("{0} and MarketType='{1}'", filter, MarketTypeBox.Text);
+			}
+
+			if (true == WordBox.Checked)
+				filter = String.Format ("{0} and MinimumWord <= {1} and MaximumWord >= {1}", filter, ProjectWords);
+
+
+			string excludefilter = Constants.BLANK;
+			// build excluded this
+			foreach (string exclude in ExcludedGuids) {
+				excludefilter = String.Format ("{0} and Guid<>'{1}'", excludefilter, exclude);
+			}
+
+			if (Constants.BLANK != excludefilter) {
+				filter = String.Format ("{0} {1}", filter, excludefilter);
+			}
+
 			return filter;
 		}
-		private void UpdateFilter ()
+		// this is called from internal and also external (NoteDataXML_Submission) to initially populate list
+		public void UpdateFilter ()
 		{
-			ViewOfTheData.RowFilter =  BuildRowFilter();//String.Format ("MinimumWord <= {0} and MaximumWord >= {0}", ProjectWords);
+			ViewOfTheData.RowFilter = BuildRowFilter ();//String.Format ("MinimumWord <= {0} and MaximumWord >= {0}", ProjectWords);
+
+			if (ListOfMarkets.Items.Count > 0) {
+				// we always want to select the topmost one
+				ListOfMarkets.SelectedIndex = 0;
+				UpdateAfterListSelection();
+			} else {
+				// We clear this if nothing in the list.
+				tmpEditor.SelectedObject = null;
+			}
 		}
 		private void OnListChanged (object sender, 
 		                           System.ComponentModel.ListChangedEventArgs args)
 		{
-			Count.Text = ViewOfTheData.Count.ToString();
+			Count.Text = Loc.Instance.GetStringFmt("Found: {0}", ViewOfTheData.Count.ToString());
 		}
 
 		public bool WordsOver (string selectedGUID)
@@ -136,9 +289,10 @@ namespace Submissions
 			}
 			return false;
 		}
-
-		public dashboardMarketEdit (DataTable _dataSource, Action<string, string> _UpdateSelectedMarket)
+		LayoutPanelBase CurrentLayout = null;
+		public dashboardMarketEdit (DataTable _dataSource, Action<string, string> _UpdateSelectedMarket, LayoutPanelBase _CurrentLayout)
 		{
+			CurrentLayout = _CurrentLayout;
 			if (null == _dataSource) throw new Exception("invalid data source passed in");
 			UpdateSelectedMarket = _UpdateSelectedMarket;
 
@@ -157,11 +311,15 @@ namespace Submissions
 			 ViewOfTheData = new DataView(_dataSource);
 			ViewOfTheData.Sort = "Caption ASC";
 			ViewOfTheData.ListChanged+= new System.ComponentModel.ListChangedEventHandler(OnListChanged);
-			ViewOfTheData.RowFilter = BuildRowFilter();
+
+			//ViewOfTheData.RowFilter = BuildRowFilter();
+
 			ListOfMarkets.DataSource = ViewOfTheData;//_dataSource;
 			ListOfMarkets.SelectedIndexChanged+= HandleMarketListSelectedIndexChanged;
 			ListOfMarkets.DisplayMember = "Caption";
 
+			//ListOfMarkets.DoubleClick+= HandleListOfDoubleClick;
+		//	ListOfMarkets.MouseDown+= HandleListOfMarketsMouseDown;
 
 
 
@@ -181,8 +339,16 @@ namespace Submissions
 
 			TabPage MarketSubmissions = new TabPage();
 			MarketSubmissions.Text = Loc.Instance.GetString("Market Submissions");
+
+
+			TabPage MarketNotes = new TabPage();
+			MarketNotes.Text = Loc.Instance.GetString ("Market Notes");
+
 			Tabs.TabPages.Add (MarketEditing);
+			Tabs.TabPages.Add (MarketNotes);
 			Tabs.TabPages.Add (MarketSubmissions);
+
+
 
 			Tabs.SelectedIndexChanged+= HandleMiniTabSelectedIndexChanged;
 		
@@ -196,6 +362,7 @@ namespace Submissions
 
 
 			PreviousSubmissions = new ListBox();
+			PreviousSubmissions.DoubleClick+= HandlePreviousSubmissionsDoubleClick;
 			PreviousSubmissions.Dock = DockStyle.Fill;
 			//PreviousSubmissions.Height = 100;
 
@@ -304,6 +471,55 @@ namespace Submissions
 			this.Controls.Add (MarketListPanel);
 			MarketListPanel.BringToFront();
 			AddMarket.SendToBack();
+
+
+
+
+			//
+			// Setup Market Notes Pages
+			//
+
+			richBox = new RichTextBox();
+			MarketNotes.Controls.Add (richBox);
+			richBox.Dock = DockStyle.Fill;
+			richBox.KeyDown+= HandleNotesKeyDown;
+
+		}
+
+		void HandlePreviousSubmissionsDoubleClick (object sender, EventArgs e)
+		{
+			DisplayNote();
+		}
+
+
+		/// We display the NOTE associated with the doubleclicked selected object
+		void DisplayNote()
+		{
+		//	NewMessage.Show ("here0");
+			if (PreviousSubmissions.SelectedItem != null) {
+//NewMessage.Show ("here");
+				string rtf_Notes = ((Transactions.TransactionSubmission)PreviousSubmissions.SelectedItem).Notes;
+			//	NewMessage.Show (rtf_Notes);
+				if (rtf_Notes != null && rtf_Notes!= Constants.BLANK)
+				{
+					GenericTextForm form = new GenericTextForm();
+					try
+					{
+						form.GetRichTextBox().Rtf = rtf_Notes;
+					}
+					catch (Exception)
+					{
+						form.GetRichTextBox().Text = rtf_Notes;
+					}
+					form.ShowDialog();
+				}
+			}
+		}
+
+
+		void HandleNotesKeyDown (object sender, KeyEventArgs e)
+		{
+			EditMode = true;
 		}
 
 		void HandleMiniTabSelectedIndexChanged (object sender, EventArgs e)
@@ -371,6 +587,11 @@ namespace Submissions
 		void SaveCurrentMarket ()
 		{
 			this.Cursor = Cursors.WaitCursor;
+
+			// update text too
+			((Market)tmpEditor.SelectedObject).Notes = richBox.Rtf;
+
+
 			PropertyInfo[] propertiesInfo = typeof(Market).GetProperties ();
 			EditMarketRow(propertiesInfo, GetDataViewTable(), (Market)tmpEditor.SelectedObject, ((Market)tmpEditor.SelectedObject).Guid);
 			this.Cursor = Cursors.Default;
@@ -389,7 +610,7 @@ namespace Submissions
 		{
 			return MasterOfLayouts.GetNameFromGuid(ProjectGUID);
 		}
-		private void BuildListForListBox (ListBox box, List<Transactions.TransactionSubmission> LayoutEvents)
+		private void BuildListForListBox (ListBox box, List<Transactions.TransactionBase> LayoutEvents)
 		{
 			box.DataSource = null;
 
@@ -429,10 +650,12 @@ namespace Submissions
 			try {
 				if (Constants.BLANK != MARKET_GUID)
 				{
-
-					BuildListForListBox(PreviousSubmissions, SubmissionMaster.GetListOfSubmissionsForMarket(MARKET_GUID));
+					List<Transactions.TransactionBase> LayoutEvents =SubmissionMaster.GetListOfSubmissionsForMarket(MARKET_GUID);
+					BuildListForListBox(PreviousSubmissions, LayoutEvents);
 					SubLabel.Text = Loc.Instance.GetStringFmt("Submissions ({0})", PreviousSubmissions.Items.Count);
-					BuildListForListBox(Destinations, SubmissionMaster.GetListOfDestinationsForMarket(MARKET_GUID));
+
+					LayoutEvents =SubmissionMaster.GetListOfDestinationsForMarket(MARKET_GUID);
+					BuildListForListBox(Destinations, LayoutEvents);
 					DestLabel.Text =Loc.Instance.GetStringFmt("Destinations ({0})", Destinations.Items.Count);
 				
 				}
@@ -455,6 +678,7 @@ namespace Submissions
 				AddMarket.Enabled = !EditMode;
 				EditMarket.Enabled = EditMode;
 				EditMarketCancel.Enabled= EditMode;
+				MarketFilters.Enabled = !EditMode;
 
 			}
 		}
@@ -479,7 +703,23 @@ namespace Submissions
 					MARKET_GUID = row["Guid"].ToString ();
 					UpdateSelectedMarket(Name, MARKET_GUID);
 				//		NewMessage.Show("seven");
-					tmpEditor.SelectedObject = SelectedMarketAsObject();
+						Market market = SelectedMarketAsObject();
+						tmpEditor.SelectedObject = market;
+
+						// load the text file
+						richBox.Text = "";
+						if (market.Notes != Constants.BLANK)
+						{
+							try{
+								richBox.Rtf = market.Notes;
+							}
+							catch (Exception)
+							{
+								richBox.Text = market.Notes;
+							}
+						}
+
+
 
 						//Attempting ReadOnly
 

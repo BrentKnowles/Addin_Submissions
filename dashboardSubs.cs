@@ -1,3 +1,31 @@
+// dashboardSubs.cs
+//
+// Copyright (c) 2013 Brent Knowles (http://www.brentknowles.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+// Review documentation at http://www.yourothermind.com for updated implementation notes, license updates
+// or other general information/
+// 
+// Author information available at http://www.brentknowles.com or http://www.amazon.com/Brent-Knowles/e/B0035WW7OW
+// Full source code: https://github.com/BrentKnowles/YourOtherMind
+//###
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -27,8 +55,9 @@ namespace MefAddIns
 				supressRefresh = value;
 			}
 		}
-
+		ListViewColumnSorter lvwColumnSorter;
 		Action<string, string> UpdateOtherForms = null;
+	
 
 		// TODO: eventually load this from the actual Submission Object
 		private string currentFilter = Constants.BLANK;
@@ -74,12 +103,13 @@ namespace MefAddIns
 			checkBoxSent.Checked = false;
 		}
        
-		ListViewColumnSorter lvwColumnSorter;
+	
 
 		public dashboardSubs (Action<string,string> _UpdateOtherForms, bool PreventRefresh)
 		{
 			SupressRefresh = PreventRefresh;
 			UpdateOtherForms = _UpdateOtherForms;
+		
 
 			InitializeComponent ();
 			lvwColumnSorter = new ListViewColumnSorter ();
@@ -194,6 +224,7 @@ namespace MefAddIns
 			}
 		//	NewMessage.Show ("Refreshing! " + SupressRefresh.ToString());
 			this.Cursor = Cursors.WaitCursor;
+			listView1.BeginUpdate();
 			listView1.Items.Clear ();
 			;
 
@@ -219,7 +250,7 @@ namespace MefAddIns
 
 			// we clear the existing project guids and such
 			UpdateOtherForms (Constants.BLANK, Constants.BLANK);
-
+			listView1.EndUpdate ();
 			//   (Parent as CoreUtilities.RollUp).TextLabel = String.Format("Submissions ({0} found)", listView1.Items.Count);
 		}
 
@@ -326,6 +357,15 @@ namespace MefAddIns
 
 				ArrayList destinations = new ArrayList ();
 
+				List<TransactionBase> Destinations = SubmissionMaster.GetListOfDestinationsForProject(sub.GUID);
+				foreach (TransactionBase transaction in Destinations)
+				{
+					LittleDestination destination = new LittleDestination();
+					destination.Market = ((TransactionSubmissionDestination)transaction).MarketName;// dr[Data.SubmissionIndexFields.MARKET_NAME].ToString();
+					destination.Priority = 0.0f;
+					float.TryParse(((TransactionSubmissionDestination)transaction).Priority, out destination.Priority);//(float)dr[Data.SubmissionIndexFields.DESTINATION_PRIORITY];
+					destinations.Add(destination);
+				}
 
 //                foreach (DataRow dr in Program.AppMainForm.data.SubmissionIndex.Rows)
 //                {
@@ -334,7 +374,7 @@ namespace MefAddIns
 //
 //                        // destinations with this GUID
 //                        if (dr[Data.SubmissionIndexFields.PROJECTGUID].ToString() == sub.GUID
-				//                            && dr[Data.SubmissionIndexFields.SUBMISSIONTYPE].ToString().ToLower() == classSubmission.DESTINATION_SUBTYPE.ToLower())
+//				                            && dr[Data.SubmissionIndexFields.SUBMISSIONTYPE].ToString().ToLower() == classSubmission.DESTINATION_SUBTYPE.ToLower())
 //                        {
 //                            // this matches the project
 //                            // now we grab all destinations
@@ -560,6 +600,14 @@ namespace MefAddIns
 		{
 			if (listView1.SelectedItems != null) {
 				//     Program.AppMainForm.OpenNewWindow( listView1.SelectedItems[0].Text, 0, false);
+				if (listView1.SelectedItems[0].Tag != null)
+				{
+					LittleSubmission sub = (LittleSubmission)listView1.SelectedItems[0].Tag;
+					LayoutDetails.Instance.LoadLayout(sub.GUID);
+				}
+				//	NewMessage.Show (listView1.SelectedItems[0].Text);
+					//LayoutDetails.Instance.LoadLayout(
+
 
 			}
 		}

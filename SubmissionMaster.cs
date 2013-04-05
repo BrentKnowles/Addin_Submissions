@@ -1,3 +1,31 @@
+// SubmissionMaster.cs
+//
+// Copyright (c) 2013 Brent Knowles (http://www.brentknowles.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+// Review documentation at http://www.yourothermind.com for updated implementation notes, license updates
+// or other general information/
+// 
+// Author information available at http://www.brentknowles.com or http://www.amazon.com/Brent-Knowles/e/B0035WW7OW
+// Full source code: https://github.com/BrentKnowles/YourOtherMind
+//###
 using System;
 using Layout;
 using Transactions;
@@ -26,7 +54,7 @@ namespace Submissions
 
 		public static void GetMarketDetailsForWarnings (string selectedMarketGuid, string projectGuid, out bool MarketAvailable, out bool ProjectSendHereBefore)
 		{
-			List<Transactions.TransactionSubmission> submissions = GetListOfSubmissionsForMarket (selectedMarketGuid);
+			List<Transactions.TransactionBase> submissions = GetListOfSubmissionsForMarket (selectedMarketGuid);
 			MarketAvailable = true;
 			ProjectSendHereBefore = false;
 
@@ -46,6 +74,39 @@ namespace Submissions
 
 		}
 
+		/// <summary>
+		/// Returns the number of acceptances
+		/// </summary>
+		/// <returns>
+		/// The acceptances.
+		/// </returns>
+		public static int CountAcceptances (LayoutPanelBase CurrentLayout, string ProjectGUID)
+		{
+			int count = 0;
+			string filter= "";
+			List<string> result = CurrentLayout.GetListOfStringsFromSystemTable (TABLE_ReplyTypes, 1, String.Format ("2|{0}", CODE_ACCEPTANCE), false);
+			if (result != null && result.Count > 0) {
+				foreach (string s in result)
+				{
+					string SPACE ="";
+					if (filter != "")
+					{
+						SPACE = " or ";
+					}
+					filter = filter + SPACE + String.Format ("data7='{0}'", s);
+				}
+				//NewMessage.Show (filter);
+				List<TransactionBase> allsubs = LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid
+					("*",String.Format(" and ({0}) and {1}='{2}' and {3}='{4}'", filter, TransactionsTable.TYPE, TransactionsTable.T_SUBMISSION,
+					                   TransactionsTable.DATA1_LAYOUTGUID, ProjectGUID));
+				if (allsubs != null)
+				{
+					count = allsubs.Count;
+				}
+			}
+			return count;
+			 
+		}
 
 
 		public static List<Transactions.TransactionBase> GetListOfSubmissionsForProject(string ProjectGUID)
@@ -58,10 +119,10 @@ namespace Submissions
 			return LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid (projectGUID,String.Format (" and {1}='{0}' ", TransactionsTable.T_SUBMISSION_DESTINATION, TransactionsTable.TYPE));
 		}
 
-		public static List<Transactions.TransactionSubmission> GetListOfSubmissionsForMarket (string mARKET_GUID)
+		public static List<Transactions.TransactionBase> GetListOfSubmissionsForMarket (string mARKET_GUID)
 		{
 
-			List<Transactions.TransactionSubmission> list_new = new List<TransactionSubmission> ();
+			List<Transactions.TransactionBase> list_new = new List<TransactionBase> ();
 
 			List<Transactions.TransactionBase> list = LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid ("*", String.Format (" and data2='{0}' and type='{1}' ", mARKET_GUID, TransactionsTable.T_SUBMISSION));
 			;
@@ -77,9 +138,35 @@ namespace Submissions
 
 
 		}
-		public static List<Transactions.TransactionSubmission> GetListOfDestinationsForMarket (string mARKET_GUID)
+		/// <summary>
+		/// Gets the list of guids of busy markets.
+		/// 
+		/// Returns the guids for those markets with submissions at them. This is used to exclude them from the marketlist filter
+		/// </summary>
+		/// <returns>
+		/// The list of guids of busy markets.
+		/// </returns>
+		public static List<string> GetListOfGuidsOfBusyMarkets (LayoutPanelBase CurrentLayout)
 		{
-			List<Transactions.TransactionSubmission> list_new = new List<TransactionSubmission> ();
+			List<string> BusyMarkets = new List<string> ();
+			List<string> result = CurrentLayout.GetListOfStringsFromSystemTable (TABLE_ReplyTypes, 1, String.Format ("2|{0}", CODE_NO_REPLY_YET), false);
+			if (result != null && result.Count > 0) {
+				List<TransactionBase> allsubs = LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid
+					("*", String.Format (" and data7='{0}' and {1}='{2}'", result[0], TransactionsTable.TYPE, TransactionsTable.T_SUBMISSION));
+
+				// this should give us a list of EVERY submission that has not received a VALID REPLY.
+				// HENCE> Every market on this list would be BUSY
+
+				foreach (TransactionBase sub in allsubs) {
+					BusyMarkets.Add (((TransactionSubmission)sub).MarketGuid);
+				}
+			}
+			return BusyMarkets;
+		}
+
+		public static List<Transactions.TransactionBase> GetListOfDestinationsForMarket (string mARKET_GUID)
+		{
+			List<Transactions.TransactionBase> list_new = new List<TransactionBase> ();
 			
 			List<Transactions.TransactionBase> list = LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid ("*", String.Format (" and data2='{0}' and type='{1}' ", mARKET_GUID, TransactionsTable.T_SUBMISSION_DESTINATION));
 			;
