@@ -121,18 +121,7 @@ namespace MefAddIns
 			checkBoxSent.Checked = false;
 
 			//NOTE: listviews do not have datasources
-			// TODO: Consider using an invisible listbox behind the scenes, if I want the FILTER to be able to work consistently across both (else I'll need to duplicate code)
 
-
-
-			//	this.listView1.Items.Clear ();
-			
-			//			MasterOfLayouts master = new MasterOfLayouts ();
-			//			this.list.DataSource = master.GetListOfLayouts ("filternotdone");
-			
-
-			//this.listView1.DisplayMember = "Caption";
-			//this.listView1.ValueMember = "Guid";
 
 
 		}
@@ -251,6 +240,7 @@ namespace MefAddIns
 			// we clear the existing project guids and such
 			UpdateOtherForms (Constants.BLANK, Constants.BLANK);
 			listView1.EndUpdate ();
+			this.columnHeader1.Text = Loc.Instance.GetStringFmt("Story ({0})", listView1.Items.Count);
 			//   (Parent as CoreUtilities.RollUp).TextLabel = String.Format("Submissions ({0} found)", listView1.Items.Count);
 		}
 

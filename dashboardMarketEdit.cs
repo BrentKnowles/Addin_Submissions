@@ -119,7 +119,7 @@ namespace Submissions
 			_MarketFilters.Text = Loc.Instance.GetString ("Filters");
 			_MarketFilters.Dock = DockStyle.Bottom;
 			_MarketFilters.Width = 200;
-			_MarketFilters.Height = 200;
+			_MarketFilters.Height = 220;
 
 			Count = new Label ();
 			Count.Text = "0";

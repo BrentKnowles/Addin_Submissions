@@ -122,7 +122,7 @@ namespace MefAddIns
 			//LayoutDetails.Instance.AddMarkupToList(new iMarkupYourOtherMind());
 			//NewMessage.Show ("Registering Picture");
 		//	Layout.LayoutDetails.Instance.AddToList(typeof(NoteDataXML_Market), Loc.Instance.GetString ("Market (ADDIN- YomSub)"));
-			Layout.LayoutDetails.Instance.AddToList(typeof(NoteDataXML_Submissions), Loc.Instance.GetString ("Submissions (ADDIN- YomSub)"));
+			Layout.LayoutDetails.Instance.AddToList(typeof(NoteDataXML_Submissions), Loc.Instance.GetString ("Submissions"));
 		}
 
 		void TMP_BuildTestingPage ()

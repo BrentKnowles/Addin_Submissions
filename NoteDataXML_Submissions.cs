@@ -663,5 +663,13 @@ namespace MefAddIns
 			
 			return Loc.Instance.GetString ("not used in an AddIn");
 		}
+		public NoteDataXML_Submissions(NoteDataInterface Note) : base(Note)
+		{
+			
+		}
+		public override void CopyNote (NoteDataInterface Note)
+		{
+			base.CopyNote (Note);
+		}
 	}
 }
