@@ -293,14 +293,15 @@ namespace Submissions
 		public dashboardMarketEdit (DataTable _dataSource, Action<string, string> _UpdateSelectedMarket, LayoutPanelBase _CurrentLayout)
 		{
 			CurrentLayout = _CurrentLayout;
-			if (null == _dataSource) throw new Exception("invalid data source passed in");
+			if (null == _dataSource)
+				throw new Exception ("invalid data source passed in");
 			UpdateSelectedMarket = _UpdateSelectedMarket;
 
-			MarketFilters = BuildMarketFilterBox();
+			MarketFilters = BuildMarketFilterBox ();
 
 
-		//	NewMessage.Show ("boo");
-			ListOfMarkets = new ListBox();
+			//	NewMessage.Show ("boo");
+			ListOfMarkets = new ListBox ();
 		
 
 			if (_dataSource.PrimaryKey.Length == 0) {
@@ -308,18 +309,18 @@ namespace Submissions
 			}
 
 
-			 ViewOfTheData = new DataView(_dataSource);
+			ViewOfTheData = new DataView (_dataSource);
 			ViewOfTheData.Sort = "Caption ASC";
-			ViewOfTheData.ListChanged+= new System.ComponentModel.ListChangedEventHandler(OnListChanged);
+			ViewOfTheData.ListChanged += new System.ComponentModel.ListChangedEventHandler (OnListChanged);
 
 			//ViewOfTheData.RowFilter = BuildRowFilter();
 
 			ListOfMarkets.DataSource = ViewOfTheData;//_dataSource;
-			ListOfMarkets.SelectedIndexChanged+= HandleMarketListSelectedIndexChanged;
+			ListOfMarkets.SelectedIndexChanged += HandleMarketListSelectedIndexChanged;
 			ListOfMarkets.DisplayMember = "Caption";
 
 			//ListOfMarkets.DoubleClick+= HandleListOfDoubleClick;
-		//	ListOfMarkets.MouseDown+= HandleListOfMarketsMouseDown;
+			//	ListOfMarkets.MouseDown+= HandleListOfMarketsMouseDown;
 
 
 
@@ -334,14 +335,14 @@ namespace Submissions
 			Tabs.Dock = DockStyle.Fill;
 
 		
-			TabPage MarketEditing = new TabPage();
+			TabPage MarketEditing = new TabPage ();
 			MarketEditing.Text = Loc.Instance.GetString ("Market Details");
 
-			TabPage MarketSubmissions = new TabPage();
-			MarketSubmissions.Text = Loc.Instance.GetString("Market Submissions");
+			TabPage MarketSubmissions = new TabPage ();
+			MarketSubmissions.Text = Loc.Instance.GetString ("Market Submissions");
 
 
-			TabPage MarketNotes = new TabPage();
+			TabPage MarketNotes = new TabPage ();
 			MarketNotes.Text = Loc.Instance.GetString ("Market Notes");
 
 			Tabs.TabPages.Add (MarketEditing);
@@ -350,37 +351,37 @@ namespace Submissions
 
 
 
-			Tabs.SelectedIndexChanged+= HandleMiniTabSelectedIndexChanged;
+			Tabs.SelectedIndexChanged += HandleMiniTabSelectedIndexChanged;
 		
 
-			SubLabel = new Label();
+			SubLabel = new Label ();
 			SubLabel.Text = Loc.Instance.GetString ("Submissions");
 			SubLabel.Dock = DockStyle.Top;
-			DestLabel = new Label();
+			DestLabel = new Label ();
 			DestLabel.Dock = DockStyle.Bottom;
-			DestLabel.Text = Loc.Instance.GetString("Destinations");
+			DestLabel.Text = Loc.Instance.GetString ("Destinations");
 
 
-			PreviousSubmissions = new ListBox();
-			PreviousSubmissions.DoubleClick+= HandlePreviousSubmissionsDoubleClick;
+			PreviousSubmissions = new ListBox ();
+			PreviousSubmissions.DoubleClick += HandlePreviousSubmissionsDoubleClick;
 			PreviousSubmissions.Dock = DockStyle.Fill;
 			//PreviousSubmissions.Height = 100;
 
-			Destinations = new ListBox();
+			Destinations = new ListBox ();
 			Destinations.Dock = DockStyle.Bottom;
 			Destinations.Height = 100;
 
 
-			tmpEditor = new PropertyGrid();
+			tmpEditor = new PropertyGrid ();
 			tmpEditor.Dock = DockStyle.Fill;
-			tmpEditor.PropertyValueChanged+= HandlePropertyValueChanged;
+			tmpEditor.PropertyValueChanged += HandlePropertyValueChanged;
 			tmpEditor.Height = 300;
 
 
 			MarketEditing.Controls.Add (tmpEditor);
 			MarketSubmissions.Controls.Add (DestLabel);
 			MarketSubmissions.Controls.Add (PreviousSubmissions);
-			PreviousSubmissions.BringToFront();
+			PreviousSubmissions.BringToFront ();
 		
 			MarketSubmissions.Controls.Add (SubLabel);
 			MarketSubmissions.Controls.Add (Destinations);
@@ -390,51 +391,59 @@ namespace Submissions
 			// MAIN TABlE
 			//
 
-		//	Panel EasyMarketEdit = new Panel();
+			//	Panel EasyMarketEdit = new Panel();
 			
-		//	EasyMarketEdit.BackColor = Color.Green;
-		//	EasyMarketEdit.Height = 200;
+			//	EasyMarketEdit.BackColor = Color.Green;
+			//	EasyMarketEdit.Height = 200;
 			
-		//	EasyMarketEdit.Dock = DockStyle.Fill;
+			//	EasyMarketEdit.Dock = DockStyle.Fill;
 
-		//	EasyMarketEdit.Controls.Add (Tabs);
+			//	EasyMarketEdit.Controls.Add (Tabs);
 			//TODO:  would prefer readonly 
-		//	tmpEditor.Enabled = false;
-			tmpEditor.BringToFront();
+			//	tmpEditor.Enabled = false;
+			tmpEditor.BringToFront ();
 
 
 
 		
 
 
-			AddMarket = new Button();
+			AddMarket = new Button ();
 			AddMarket.Dock = DockStyle.Bottom;
 			AddMarket.Text = Loc.Instance.GetString ("Add Market");
-			AddMarket.Click+= HandleAddMarketClick;
+			AddMarket.Click += HandleAddMarketClick;
 
-			EditMarket = new Button();
+			EditMarket = new Button ();
 			EditMarket.Text = Loc.Instance.GetString ("Save Edits");
 			EditMarket.Dock = DockStyle.Fill;
 			EditMarket.Enabled = false;
-			EditMarket.Click+= HandleEditMarketClick;
+			EditMarket.Click += HandleEditMarketClick;
 
-			EditMarketCancel = new Button();
+			EditMarketCancel = new Button ();
 			EditMarketCancel.Dock = DockStyle.Fill;
 			EditMarketCancel.Text = Loc.Instance.GetString ("Cancel Edit");
-			EditMarketCancel.Enabled= false;
-			EditMarketCancel.Click+= HandleEditMarketCancelClick;
+			EditMarketCancel.Enabled = false;
+			EditMarketCancel.Click += HandleEditMarketCancelClick;
 			
-			TableLayoutPanel MarketListPanel = new TableLayoutPanel();
+			TableLayoutPanel MarketListPanel = new TableLayoutPanel ();
 			
 			MarketListPanel.RowCount = 2;
-			MarketListPanel.ColumnCount = 2;
+			MarketListPanel.ColumnCount = 3;
 
-			MarketListPanel.Controls.Add (EditMarket, 0, 0);
-			MarketListPanel.Controls.Add (EditMarketCancel, 1, 0);
+
+			MarketListPanel.Controls.Add (EditMarket, 1, 0);
+			MarketListPanel.Controls.Add (AddMarket, 0, 0);
+			MarketListPanel.Controls.Add (EditMarketCancel, 2, 0);
+
+
 			//MarketListPanel.Controls.Add (EditMarketCancel, 1, 0);
 
 			//MarketListPanel.Controls.Add (ListOfMarkets, 0, 1);
 			MarketListPanel.Controls.Add (Tabs, 1, 1);
+			MarketListPanel.SetColumnSpan (Tabs, 2);
+
+
+		
 		//	MarketListPanel.Controls.Add (PreviousSubmissions, 1, 2);
 
 		//	MarketListPanel.Controls.Add (AddMarket, 0, 3);
@@ -465,12 +474,12 @@ namespace Submissions
 
 
 
-			this.Controls.Add (AddMarket);
+			//this.Controls.Add (AddMarket);
 		
 			//NewMessage.Show ("boo2");
 			this.Controls.Add (MarketListPanel);
 			MarketListPanel.BringToFront();
-			AddMarket.SendToBack();
+		//	AddMarket.SendToBack();
 
 
 
@@ -484,6 +493,20 @@ namespace Submissions
 			richBox.Dock = DockStyle.Fill;
 			richBox.KeyDown+= HandleNotesKeyDown;
 
+
+
+			MarketListPanel.ColumnStyles.Clear();
+			for (int i = 0; i < MarketListPanel.ColumnCount; i++)
+			{
+				ColumnStyle style = new ColumnStyle(SizeType.Percent, 33.0f);
+				MarketListPanel.ColumnStyles.Add(style);
+			}
+			
+			MarketListPanel.RowStyles.Clear();
+			for (int i = 0; i < MarketListPanel.RowCount; i++)
+			{
+				MarketListPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+			}
 		}
 
 		void HandlePreviousSubmissionsDoubleClick (object sender, EventArgs e)
@@ -576,12 +599,29 @@ namespace Submissions
 			// a wrapper to grab the associated datasource
 			return ((DataView)ListOfMarkets.DataSource).Table;
 		}
+
+		void GoToMarketInList (string caption)
+		{
+			int index = 0;
+		//	NewMessage.Show (ListOfMarkets.Items[0].ToString ());
+			for (int i = 0; i < ListOfMarkets.Items.Count; i++) {
+				DataRowView o = (DataRowView)ListOfMarkets.Items [i];
+				if (o["Caption"].ToString() == caption) {
+					index = i;
+				}
+			}
+			ListOfMarkets.SelectedIndex = index;
+		}
+
 		void HandleAddMarketClick (object sender, EventArgs e)
 		{
 			PropertyInfo[] propertiesInfo = typeof(Market).GetProperties ();
 			Market newMarket = Market.DefaultMarket ();
-			newMarket.Caption = Loc.Instance.GetStringFmt("New Market {0}", DateTime.Now.ToShortDateString());
+			 string caption = Loc.Instance.GetStringFmt("New Market {0}", DateTime.Now.ToShortDateString());
+			newMarket.Caption = caption;
 			AddMarketRow (propertiesInfo, 	 GetDataViewTable(), newMarket);
+			GoToMarketInList(caption);
+
 		}
 
 		void SaveCurrentMarket ()
@@ -591,10 +631,11 @@ namespace Submissions
 			// update text too
 			((Market)tmpEditor.SelectedObject).Notes = richBox.Rtf;
 
-
+			string caption = ((Market)tmpEditor.SelectedObject).Caption;
 			PropertyInfo[] propertiesInfo = typeof(Market).GetProperties ();
 			EditMarketRow(propertiesInfo, GetDataViewTable(), (Market)tmpEditor.SelectedObject, ((Market)tmpEditor.SelectedObject).Guid);
 			this.Cursor = Cursors.Default;
+			GoToMarketInList(caption);
 		}
 
 		void HandleEditMarketClick (object sender, EventArgs e)
