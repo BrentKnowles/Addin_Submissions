@@ -48,6 +48,11 @@ namespace MefAddIns
 		Func<string> GetProjectGUID = null;
 		getmarketbyguiddelegate GetMarketByGUID=null;
 
+		string Project_Name {
+			get { return MasterOfLayouts.GetNameFromGuid(GetProjectGUID());}
+		
+		}
+
 		public string ProjectGUID {
 			get { return GetProjectGUID();}
 		}
@@ -562,7 +567,7 @@ namespace MefAddIns
 				//				
 				//		
 				//				{
-								string main	 = String.Format("Overall this submission has had {0} responses from potential markets and has earned ${1}", sLabel, fEarned.ToString());
+					string main	 = String.Format("Overall {2} has had {0} responses from potential markets and has earned ${1}", sLabel, fEarned.ToString(), Project_Name.ToUpper ());
 				//				}
 					SetLabel(main, HistoryOfFeedback);
 				}
