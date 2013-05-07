@@ -412,8 +412,8 @@ namespace MefAddIns
 			}
 			else
 			{
-				//TODO: Remove this message
-				NewMessage.Show ("Transaction list for this note was empty. Remove me after debugging.");
+
+				lg.Instance.Line ("ViewProjectSubmissions->UpdateListBox", ProblemType.MESSAGE,"Transaction list for this note was empty. Remove me after debugging.");
 			}
 		}
 

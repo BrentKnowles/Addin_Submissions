@@ -219,7 +219,7 @@ namespace Submissions
 			                rights.Text = Sub.Rights;
 
 			textBoxDraft.Text = Sub.Draft; 
-			//TODO: change ePriority to a Numeric?
+
 			ePriority.Text = Sub.Priority; //row[Data.SubmissionIndexFields.DESTINATION_PRIORITY].ToString();
 			try
 				                    {

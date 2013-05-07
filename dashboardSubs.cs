@@ -59,7 +59,7 @@ namespace MefAddIns
 		Action<string, string> UpdateOtherForms = null;
 	
 
-		// TODO: eventually load this from the actual Submission Object
+
 		private string currentFilter = Constants.BLANK;
 
 		public string CurrentFilter {

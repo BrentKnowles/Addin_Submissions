@@ -127,12 +127,12 @@ namespace MefAddIns
 
 		private void CreateSubmissionTypeTable()
 		{
-			NoteDataXML_Table randomTables = new NoteDataXML_Table(100, 100, new appframe.ColumnDetails[3]{new appframe.ColumnDetails("id",100), 
-				new appframe.ColumnDetails("name",100), new appframe.ColumnDetails("code",100)} );
+			NoteDataXML_Table randomTables = new NoteDataXML_Table(100, 100, new ColumnDetails[3]{new ColumnDetails("id",100), 
+				new ColumnDetails("name",100), new ColumnDetails("code",100)} );
 			randomTables.Caption = SubmissionMaster.TABLE_SubmissionTypes;
 			randomTables.GuidForNote = SubmissionMaster.TABLE_SubmissionTypes;
-			randomTables.Columns = new appframe.ColumnDetails[3]{new appframe.ColumnDetails("id",100), 
-				new appframe.ColumnDetails("name",100), new appframe.ColumnDetails("code",100)};
+			randomTables.Columns = new ColumnDetails[3]{new ColumnDetails("id",100), 
+				new ColumnDetails("name",100), new ColumnDetails("code",100)};
 			Layout.AddNote(randomTables);
 			randomTables.CreateParent(Layout);
 			
@@ -151,8 +151,8 @@ namespace MefAddIns
 
 		private void CreateReplyTypeTable()
 		{
-			NoteDataXML_Table randomTables = new NoteDataXML_Table(100, 100, new appframe.ColumnDetails[3]{new appframe.ColumnDetails("id",100), 
-				new appframe.ColumnDetails("name",100), new appframe.ColumnDetails("code",100)} );
+			NoteDataXML_Table randomTables = new NoteDataXML_Table(100, 100, new ColumnDetails[3]{new ColumnDetails("id",100), 
+				new ColumnDetails("name",100), new ColumnDetails("code",100)} );
 			randomTables.Caption = SubmissionMaster.TABLE_ReplyTypes;
 			randomTables.GuidForNote = SubmissionMaster.TABLE_ReplyTypes;
 		//	randomTables.Columns =
@@ -173,8 +173,8 @@ namespace MefAddIns
 
 		private void CreateReplyFeedbackTable()
 		{
-			NoteDataXML_Table randomTables = new NoteDataXML_Table(100, 100, new appframe.ColumnDetails[3]{new appframe.ColumnDetails("id",100), 
-				new appframe.ColumnDetails("name",100), new appframe.ColumnDetails("code",100)} );
+			NoteDataXML_Table randomTables = new NoteDataXML_Table(100, 100, new ColumnDetails[3]{new ColumnDetails("id",100), 
+				new ColumnDetails("name",100), new ColumnDetails("code",100)} );
 			randomTables.Caption = SubmissionMaster.TABLE_ReplyFeedback;
 			randomTables.GuidForNote = SubmissionMaster.TABLE_ReplyFeedback;
 			//	randomTables.Columns =

@@ -48,10 +48,6 @@
       <Project>{77AADEE3-CCBF-4802-9703-30EA7A4424AC}</Project>
       <Name>LayoutPanels</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\yom2013B\ApplicationFramework\ApplicationFramework.csproj">
-      <Project>{1C8CC9F9-FD0A-4DDF-B227-61E8135DFCE5}</Project>
-      <Name>ApplicationFramework</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\yom2013B\EventTable\TransactionSystem.csproj">
       <Project>{015AC0C9-2F05-45BE-AD21-5A475AACA2D7}</Project>
       <Name>TransactionSystem</Name>
@@ -59,6 +55,10 @@
     <ProjectReference Include="..\..\yom2013B\database\database.csproj">
       <Project>{C08FDDB5-5C59-4611-98E7-76674F290896}</Project>
       <Name>database</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\yom2013B\ApplicationFramework\ApplicationFramework.csproj">
+      <Project>{1C8CC9F9-FD0A-4DDF-B227-61E8135DFCE5}</Project>
+      <Name>ApplicationFramework</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

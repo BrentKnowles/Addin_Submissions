@@ -33,6 +33,7 @@ using CoreUtilities;
 using System.Data;
 using System.Reflection;
 using Layout;
+using MefAddIns;
 namespace Submissions
 {
 	public class Market
@@ -518,8 +519,8 @@ namespace Submissions
 		{
 			Market defaultMarket = new Market();
 			defaultMarket.Guid = System.Guid.NewGuid().ToString ();
-			defaultMarket.PublishType = LayoutDetails.Instance.TableLayout.GetListOfStringsFromSystemTable(LayoutDetails.SYSTEM_PUBLISHTYPES,1)[0];
-			defaultMarket.MarketType = LayoutDetails.Instance.TableLayout.GetListOfStringsFromSystemTable(LayoutDetails.SYSTEM_MARKETTYPES,1)[0];;
+			defaultMarket.PublishType = LayoutDetails.Instance.TableLayout.GetListOfStringsFromSystemTable(Addin_Submissions.SYSTEM_PUBLISHTYPES,1)[0];
+			defaultMarket.MarketType = LayoutDetails.Instance.TableLayout.GetListOfStringsFromSystemTable(Addin_Submissions.SYSTEM_MARKETTYPES,1)[0];;
 			defaultMarket.MinimumWord = 1000;
 			defaultMarket.MaximumWord = 5000;
 			defaultMarket.AcceptReprints = false;

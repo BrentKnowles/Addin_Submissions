@@ -66,7 +66,7 @@ namespace MefAddIns
 		{
 			// version history
 			// 1.2 - remove destination from default submission type table becaues end users to do not need it
-			get { return @"1.2.0.0"; }
+			get { return @"1.3.0.0"; }
 		}
 		public string Description
 		{
@@ -114,6 +114,9 @@ namespace MefAddIns
 		//				myRunnForHotKeys(myAddInOnMainFormForHotKeys);
 		//			
 		//		}
+
+		public const  string SYSTEM_PUBLISHTYPES ="list_publishtypes";
+		public const  string SYSTEM_MARKETTYPES ="list_markettypes";
 		public override void RegisterType ()
 		{
 
@@ -123,6 +126,57 @@ namespace MefAddIns
 			//NewMessage.Show ("Registering Picture");
 		//	Layout.LayoutDetails.Instance.AddToList(typeof(NoteDataXML_Market), Loc.Instance.GetString ("Market (ADDIN- YomSub)"));
 			Layout.LayoutDetails.Instance.AddToList(typeof(NoteDataXML_Submissions), Loc.Instance.GetString ("Submissions"));
+
+
+
+			// Build default table of grammar
+			
+			string TableName = SYSTEM_PUBLISHTYPES;
+			LayoutPanels.NoteDataXML_Panel PanelContainingTables = LayoutPanel.GetPanelToAddTableTo (TableName);
+			//	BringToFrontAndShow ();
+			// can't use TableLayout because its not the actual tablelayout (its a copy)
+			if (PanelContainingTables != null) {
+				
+				// create the note
+				NoteDataXML_Table	randomTables = new NoteDataXML_Table(100, 100, new ColumnDetails[2]{new ColumnDetails("id",100), 
+					new ColumnDetails("category",100)});
+				
+				randomTables.Caption = TableName;
+				
+				
+				PanelContainingTables.AddNote (randomTables);
+				randomTables.CreateParent (PanelContainingTables.GetPanelsLayout ());
+				
+				randomTables.AddRow(new object[2]{"1", Loc.Instance.GetString("Both")});
+				randomTables.AddRow(new object[2]{"2", Loc.Instance.GetString("Electronic")});
+				randomTables.AddRow(new object[2]{"3", Loc.Instance.GetString("None")});
+				randomTables.AddRow(new object[2]{"4", Loc.Instance.GetString("Print")});
+				
+				//		LayoutDetails.Instance.TableLayout.SaveLayout();
+				PanelContainingTables.GetPanelsLayout ().SaveLayout ();
+
+
+				// now add the next table
+				TableName = SYSTEM_MARKETTYPES;
+				randomTables = new NoteDataXML_Table(100, 100, new ColumnDetails[2]{new ColumnDetails("id",100), 
+					new ColumnDetails("category",100)});
+				randomTables.Caption = TableName;
+				PanelContainingTables.AddNote (randomTables);
+				randomTables.CreateParent (PanelContainingTables.GetPanelsLayout ());
+
+				randomTables.AddRow(new object[2]{"1", Loc.Instance.GetString("Non Paying")});
+				randomTables.AddRow(new object[2]{"2", Loc.Instance.GetString("None")});
+				randomTables.AddRow(new object[2]{"3", Loc.Instance.GetString("Semi-Pro")});
+				randomTables.AddRow(new object[2]{"4", Loc.Instance.GetString("Small Press (Token)")});
+				randomTables.AddRow(new object[2]{"5", Loc.Instance.GetString("Pro Market")});
+
+				//NewMessage.Show("Making new");
+				// now we reload the system version
+				PanelContainingTables.GetPanelsLayout ().SaveLayout ();
+				LayoutDetails.Instance.TableLayout.LoadLayout (LayoutDetails.TABLEGUID, true, null);
+				//BringToFrontAndShow ();
+			}
+
 		}
 
 		void TMP_BuildTestingPage ()
@@ -170,28 +224,7 @@ namespace MefAddIns
 
 			//NewMessage.Show (Found.ToString ());
 		}
-		public void TMP_FindAllMarketsWithCriteria_USING_A_TABLE_INSTEAD ()
-		{
-			// OK: this is super fast too
-			ArrayList FoundM = LayoutDetails.Instance.CurrentLayout.GetAllNotes ();
-			foreach (NoteDataInterface note in FoundM) {
-				if (note is NoteDataXML_Submissions) {
-					//List<DataRow> rows = (note as NoteDataXML_Submissions).GetRows();
-					DataView View = new DataView((note as NoteDataXML_Submissions).dataSource);
-					//TODO: When build default table I need to define types somehow
-					View.RowFilter = "Roll > '0' and Roll < '3'";
-					NewMessage.Show(View.Count.ToString());
-				}
-				
-			}
-			
-			
 
-
-			
-			
-
-		}
 
 
 

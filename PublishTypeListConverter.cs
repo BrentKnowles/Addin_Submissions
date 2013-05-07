@@ -30,6 +30,7 @@ using System;
 using CoreUtilities;
 using Layout;
 using System.Collections.Generic;
+using MefAddIns;
 
 namespace CoreUtilities
 {
@@ -40,7 +41,7 @@ namespace CoreUtilities
 			get { 
 
 
-				return LayoutDetails.Instance.TableLayout.GetListOfStringsFromSystemTable(LayoutDetails.SYSTEM_PUBLISHTYPES,1);
+				return LayoutDetails.Instance.TableLayout.GetListOfStringsFromSystemTable(Addin_Submissions.SYSTEM_PUBLISHTYPES,1);
 			}
 		}
 	}

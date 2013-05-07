@@ -30,6 +30,7 @@ using System;
 using System.Collections.Generic;
 using CoreUtilities;
 using Layout;
+using MefAddIns;
 namespace CoreUtilities
 {
 	public class MarketTypeListConverter : GenericTypeListConverter
@@ -38,7 +39,7 @@ namespace CoreUtilities
 		{
 			get { 
 				
-			return	LayoutDetails.Instance.TableLayout.GetListOfStringsFromSystemTable(LayoutDetails.SYSTEM_MARKETTYPES,1);
+			return	LayoutDetails.Instance.TableLayout.GetListOfStringsFromSystemTable(Addin_Submissions.SYSTEM_MARKETTYPES,1);
 			
 			}
 		}

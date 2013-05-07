@@ -48,8 +48,11 @@ namespace Submissions
 			SubEditPanel = new SubmissionEditPanel(ProvideDefaults);
 			SubEditPanel.Dock = DockStyle.Fill;
 			this.Controls.Add (SubEditPanel);
-			this.Width = 1075;
+			this.Width = 1200;
 			this.Height = 850;
+
+			this.VerticalScroll.Enabled = true;
+
 			this.Icon = LayoutDetails.Instance.MainFormIcon;
 			FormUtils.SizeFormsForAccessibility(this, LayoutDetails.Instance.MainFormFontSize);
 
@@ -75,7 +78,7 @@ namespace Submissions
 			this.Controls.Add (bottomPanel);
 			this.Controls.Add (SubEditPanel);
 			SubEditPanel.BringToFront();
-
+			this.AutoScroll = true;
 
 		}
 	}

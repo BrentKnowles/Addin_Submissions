@@ -34,6 +34,7 @@ using CoreUtilities;
 using Layout;
 using System.Collections.Generic;
 using System.Reflection;
+using MefAddIns;
 namespace Submissions
 {
 	// wrapper for the market editing
@@ -154,7 +155,7 @@ namespace Submissions
 
 			PublishingTypeBox = new ComboBox ();
 			PublishingTypeBox.DropDownStyle = ComboBoxStyle.DropDownList;
-			List<string> publishtypes = LayoutDetails.Instance.TableLayout.GetListOfStringsFromSystemTable (LayoutDetails.SYSTEM_PUBLISHTYPES, 1);
+			List<string> publishtypes = LayoutDetails.Instance.TableLayout.GetListOfStringsFromSystemTable (Addin_Submissions.SYSTEM_PUBLISHTYPES, 1);
 			publishtypes.Add (Constants.BLANK);
 			PublishingTypeBox.Dock = DockStyle.Top;
 			foreach (string s in publishtypes) {
@@ -165,7 +166,7 @@ namespace Submissions
 
 			MarketTypeBox = new ComboBox ();
 			MarketTypeBox.DropDownStyle = ComboBoxStyle.DropDownList;
-			List<string> markettypes = LayoutDetails.Instance.TableLayout.GetListOfStringsFromSystemTable (LayoutDetails.SYSTEM_MARKETTYPES, 1);
+			List<string> markettypes = LayoutDetails.Instance.TableLayout.GetListOfStringsFromSystemTable (Addin_Submissions.SYSTEM_MARKETTYPES, 1);
 			markettypes.Add (Constants.BLANK);
 			MarketTypeBox.Dock = DockStyle.Top;
 			foreach (string s in markettypes) {
@@ -399,7 +400,7 @@ namespace Submissions
 			//	EasyMarketEdit.Dock = DockStyle.Fill;
 
 			//	EasyMarketEdit.Controls.Add (Tabs);
-			//TODO:  would prefer readonly 
+
 			//	tmpEditor.Enabled = false;
 			tmpEditor.BringToFront ();
 
@@ -677,8 +678,8 @@ namespace Submissions
 			}
 			else
 			{
-				//TODO: Remove this message
-				NewMessage.Show ("Transaction list for this note was empty. Remove me after debugging.");
+
+				lg.Instance.Line ("dashboardMarketEdit.BuildListForListbox",ProblemType.MESSAGE, "Transaction list for this note was empty. Remove me after debugging.");
 			}
 		}
 
