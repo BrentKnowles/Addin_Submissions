@@ -770,6 +770,12 @@ namespace MefAddIns
 			}
 			listView1.Sort ();
 		}
+
+		public void UpdateAppearance (AppearanceClass app)
+		{
+			this.ForeColor = app.captionForeground;
+			buttonRefresh.BackColor = app.mainBackground;
+		}
 	}
 
     

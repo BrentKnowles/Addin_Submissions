@@ -124,8 +124,8 @@ namespace MefAddIns
 
 			//LayoutDetails.Instance.AddMarkupToList(new iMarkupYourOtherMind());
 			//NewMessage.Show ("Registering Picture");
-		//	Layout.LayoutDetails.Instance.AddToList(typeof(NoteDataXML_Market), Loc.Instance.GetString ("Market (ADDIN- YomSub)"));
-			Layout.LayoutDetails.Instance.AddToList(typeof(NoteDataXML_Submissions), Loc.Instance.GetString ("Submissions"));
+			//	Layout.LayoutDetails.Instance.AddToList(typeof(NoteDataXML_Market), Loc.Instance.GetString ("Market (ADDIN- YomSub)"));
+			Layout.LayoutDetails.Instance.AddToList (typeof(NoteDataXML_Submissions), Loc.Instance.GetString ("Submissions"));
 
 
 
@@ -138,8 +138,8 @@ namespace MefAddIns
 			if (PanelContainingTables != null) {
 				
 				// create the note
-				NoteDataXML_Table	randomTables = new NoteDataXML_Table(100, 100, new ColumnDetails[2]{new ColumnDetails("id",100), 
-					new ColumnDetails("category",100)});
+				NoteDataXML_Table randomTables = new NoteDataXML_Table (100, 100, new ColumnDetails[2]{new ColumnDetails ("id", 100), 
+					new ColumnDetails ("category", 100)});
 				
 				randomTables.Caption = TableName;
 				
@@ -147,10 +147,10 @@ namespace MefAddIns
 				PanelContainingTables.AddNote (randomTables);
 				randomTables.CreateParent (PanelContainingTables.GetPanelsLayout ());
 				
-				randomTables.AddRow(new object[2]{"1", Loc.Instance.GetString("Both")});
-				randomTables.AddRow(new object[2]{"2", Loc.Instance.GetString("Electronic")});
-				randomTables.AddRow(new object[2]{"3", Loc.Instance.GetString("None")});
-				randomTables.AddRow(new object[2]{"4", Loc.Instance.GetString("Print")});
+				randomTables.AddRow (new object[2]{"1", Loc.Instance.GetString ("Both")});
+				randomTables.AddRow (new object[2]{"2", Loc.Instance.GetString ("Electronic")});
+				randomTables.AddRow (new object[2]{"3", Loc.Instance.GetString ("None")});
+				randomTables.AddRow (new object[2]{"4", Loc.Instance.GetString ("Print")});
 				
 				//		LayoutDetails.Instance.TableLayout.SaveLayout();
 				PanelContainingTables.GetPanelsLayout ().SaveLayout ();
@@ -158,23 +158,25 @@ namespace MefAddIns
 
 				// now add the next table
 				TableName = SYSTEM_MARKETTYPES;
-				randomTables = new NoteDataXML_Table(100, 100, new ColumnDetails[2]{new ColumnDetails("id",100), 
-					new ColumnDetails("category",100)});
+				randomTables = new NoteDataXML_Table (100, 100, new ColumnDetails[2]{new ColumnDetails ("id", 100), 
+					new ColumnDetails ("category", 100)});
 				randomTables.Caption = TableName;
 				PanelContainingTables.AddNote (randomTables);
 				randomTables.CreateParent (PanelContainingTables.GetPanelsLayout ());
 
-				randomTables.AddRow(new object[2]{"1", Loc.Instance.GetString("Non Paying")});
-				randomTables.AddRow(new object[2]{"2", Loc.Instance.GetString("None")});
-				randomTables.AddRow(new object[2]{"3", Loc.Instance.GetString("Semi-Pro")});
-				randomTables.AddRow(new object[2]{"4", Loc.Instance.GetString("Small Press (Token)")});
-				randomTables.AddRow(new object[2]{"5", Loc.Instance.GetString("Pro Market")});
+				randomTables.AddRow (new object[2]{"1", Loc.Instance.GetString ("Non Paying")});
+				randomTables.AddRow (new object[2]{"2", Loc.Instance.GetString ("None")});
+				randomTables.AddRow (new object[2]{"3", Loc.Instance.GetString ("Semi-Pro")});
+				randomTables.AddRow (new object[2]{"4", Loc.Instance.GetString ("Small Press (Token)")});
+				randomTables.AddRow (new object[2]{"5", Loc.Instance.GetString ("Pro Market")});
 
 				//NewMessage.Show("Making new");
 				// now we reload the system version
 				PanelContainingTables.GetPanelsLayout ().SaveLayout ();
 				LayoutDetails.Instance.TableLayout.LoadLayout (LayoutDetails.TABLEGUID, true, null);
 				//BringToFrontAndShow ();
+			} else {
+				//NewMessage.Show ("Panel not found");
 			}
 
 		}

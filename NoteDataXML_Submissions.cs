@@ -88,6 +88,8 @@ namespace MefAddIns
 		Label Warnings = null;
 		Label LabelMarket = null;
 		Button ToggleBetweenListAndEditSubmissions = null;
+
+		GroupBox SubmitPanel = null;
 		#endregion
 
 
@@ -304,7 +306,7 @@ namespace MefAddIns
 			//
 		
 		
-			GroupBox SubmitPanel = new GroupBox ();
+			SubmitPanel = new GroupBox ();
 			SubmitPanel.BackColor = Color.Lavender;
 			SubmitPanel.ForeColor = Color.Black;
 			SubmitPanel.Height = 150;
@@ -670,6 +672,24 @@ namespace MefAddIns
 		public override void CopyNote (NoteDataInterface Note)
 		{
 			base.CopyNote (Note);
+		}
+		protected override AppearanceClass UpdateAppearance ()
+		{
+			AppearanceClass app = base.UpdateAppearance ();
+			if (app != null) {
+				Tabs.BackColor = app.mainBackground;
+
+				this.SubmissionPanel.UpdateAppearance(app);
+
+
+
+				LabelProject.ForeColor = app.captionForeground;
+				this.Warnings.ForeColor = app.captionForeground;
+				LabelMarket.ForeColor = app.captionForeground;
+				SubmitPanel.BackColor = app.mainBackground;
+				SubmitPanel.ForeColor = app.captionForeground;
+			}
+			return app;
 		}
 	}
 }
