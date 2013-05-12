@@ -456,7 +456,7 @@ namespace MefAddIns
 					query = query + String.Format (" {1}='{0}' ", s, TransactionsTable.DATA7);
 				}
 				
-				string querywrapper = String.Format ("and {1}='{2}' and ({0})", query, TransactionsTable.TYPE, TransactionsTable.T_SUBMISSION);
+				string querywrapper = String.Format ("and {1}='{2}' and ({0})", query, TransactionsTable.TYPE, TransactionSubmission.T_SUBMISSION);
 
 			//	foreach (ListViewItem item in listView1.Items)
 				foreach (MasterOfLayouts.NameAndGuid item in LayoutsFound)

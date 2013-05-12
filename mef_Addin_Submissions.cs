@@ -119,8 +119,9 @@ namespace MefAddIns
 		public const  string SYSTEM_MARKETTYPES ="list_markettypes";
 		public override void RegisterType ()
 		{
-
-		
+//			NewMessage.Show ("adding transactions");
+//			LayoutDetails.Instance.AddTo_TransactionsLIST(typeof(Transactions.TransactionSubmission));
+//			LayoutDetails.Instance.AddTo_TransactionsLIST(typeof(Transactions.TransactionSubmissionDestination));
 
 			//LayoutDetails.Instance.AddMarkupToList(new iMarkupYourOtherMind());
 			//NewMessage.Show ("Registering Picture");

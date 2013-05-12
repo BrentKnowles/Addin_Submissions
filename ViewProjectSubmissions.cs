@@ -499,7 +499,7 @@ namespace MefAddIns
 					//string sFilter = String.Format("{0} = '{1}'", Data.SubmissionIndexFields.REPLYFEEDBACK, s);
 					int nEncouragingCount = 
 						LayoutDetails.Instance.TransactionsList.CountQuery(String.Format ("select Count({0}) from {1} where {2}='{3}' and {4}='{5}' and {6}='{7}'", TransactionsTable.DATA8, TransactionsTable.table_name,
-						                                                                  TransactionsTable.DATA1_LAYOUTGUID, guid, TransactionsTable.DATA8, s, TransactionsTable.TYPE, TransactionsTable.T_SUBMISSION));
+							                                                                  TransactionsTable.DATA1_LAYOUTGUID, guid, TransactionsTable.DATA8, s, TransactionsTable.TYPE,  TransactionSubmission.T_SUBMISSION));
 					//int nEncouragingCount = (int)OurTable.Compute(String.Format("COUNT({0})", Data.SubmissionIndexFields.REPLYFEEDBACK), sFilter);
 					
 					
@@ -547,7 +547,7 @@ namespace MefAddIns
 					if (Constants.BLANK != ProjectGUID)
 					{
 						string SumFilter = String.Format (" {0}='{1}' and {2}='{3}'", TransactionsTable.DATA1_LAYOUTGUID, ProjectGUID
-						                                  ,TransactionsTable.TYPE, TransactionsTable.T_SUBMISSION);
+						                                  ,TransactionsTable.TYPE,  TransactionSubmission.T_SUBMISSION);
 						fEarned = LayoutDetails.Instance.TransactionsList.Sum(ProjectGUID, TransactionsTable.MONEY2, SumFilter);
 						fSpent = LayoutDetails.Instance.TransactionsList.Sum(ProjectGUID, TransactionsTable.MONEY1, SumFilter);
 					}

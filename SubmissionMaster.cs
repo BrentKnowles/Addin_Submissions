@@ -97,7 +97,7 @@ namespace Submissions
 				}
 				//NewMessage.Show (filter);
 				List<TransactionBase> allsubs = LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid
-					("*",String.Format(" and ({0}) and {1}='{2}' and {3}='{4}'", filter, TransactionsTable.TYPE, TransactionsTable.T_SUBMISSION,
+					("*",String.Format(" and ({0}) and {1}='{2}' and {3}='{4}'", filter, TransactionsTable.TYPE,  TransactionSubmission.T_SUBMISSION,
 					                   TransactionsTable.DATA1_LAYOUTGUID, ProjectGUID));
 				if (allsubs != null)
 				{
@@ -111,12 +111,12 @@ namespace Submissions
 
 		public static List<Transactions.TransactionBase> GetListOfSubmissionsForProject(string ProjectGUID)
 		{
-			return LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid (ProjectGUID,String.Format (" and {1}='{0}' ", TransactionsTable.T_SUBMISSION, TransactionsTable.TYPE));
+			return LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid (ProjectGUID,String.Format (" and {1}='{0}' ",  TransactionSubmission.T_SUBMISSION, TransactionsTable.TYPE));
 		}
 
 		public static List<TransactionBase> GetListOfDestinationsForProject (string projectGUID)
 		{
-			return LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid (projectGUID,String.Format (" and {1}='{0}' ", TransactionsTable.T_SUBMISSION_DESTINATION, TransactionsTable.TYPE));
+			return LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid (projectGUID,String.Format (" and {1}='{0}' ",  TransactionSubmission.T_SUBMISSION_DESTINATION, TransactionsTable.TYPE));
 		}
 
 		public static List<Transactions.TransactionBase> GetListOfSubmissionsForMarket (string mARKET_GUID)
@@ -124,7 +124,7 @@ namespace Submissions
 
 			List<Transactions.TransactionBase> list_new = new List<TransactionBase> ();
 
-			List<Transactions.TransactionBase> list = LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid ("*", String.Format (" and data2='{0}' and type='{1}' ", mARKET_GUID, TransactionsTable.T_SUBMISSION));
+			List<Transactions.TransactionBase> list = LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid ("*", String.Format (" and data2='{0}' and type='{1}' ", mARKET_GUID,  TransactionSubmission.T_SUBMISSION));
 			;
 			foreach (Transactions.TransactionBase tran in list) {
 				if (tran is Transactions.TransactionSubmission)
@@ -152,13 +152,21 @@ namespace Submissions
 			List<string> result = CurrentLayout.GetListOfStringsFromSystemTable (TABLE_ReplyTypes, 1, String.Format ("2|{0}", CODE_NO_REPLY_YET), false);
 			if (result != null && result.Count > 0) {
 				List<TransactionBase> allsubs = LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid
-					("*", String.Format (" and data7='{0}' and {1}='{2}'", result[0], TransactionsTable.TYPE, TransactionsTable.T_SUBMISSION));
+					("*", String.Format (" and data7='{0}' and {1}='{2}'", result[0], TransactionsTable.TYPE,  TransactionSubmission.T_SUBMISSION));
 
 				// this should give us a list of EVERY submission that has not received a VALID REPLY.
 				// HENCE> Every market on this list would be BUSY
 
 				foreach (TransactionBase sub in allsubs) {
+				//	if (sub is TransactionSubmission)
+					{
+				//		NewMessage.Show ("Adding " + sub.Display);
 					BusyMarkets.Add (((TransactionSubmission)sub).MarketGuid);
+					}
+//					else
+//					{
+//						NewMessage.Show ("Not adding " + sub.Display);
+//					}
 				}
 			}
 			return BusyMarkets;
@@ -168,7 +176,7 @@ namespace Submissions
 		{
 			List<Transactions.TransactionBase> list_new = new List<TransactionBase> ();
 			
-			List<Transactions.TransactionBase> list = LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid ("*", String.Format (" and data2='{0}' and type='{1}' ", mARKET_GUID, TransactionsTable.T_SUBMISSION_DESTINATION));
+			List<Transactions.TransactionBase> list = LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid ("*", String.Format (" and data2='{0}' and type='{1}' ", mARKET_GUID,  TransactionSubmission.T_SUBMISSION_DESTINATION));
 			;
 			foreach (Transactions.TransactionBase tran in list) {
 				if (tran is Transactions.TransactionSubmissionDestination)
@@ -183,7 +191,7 @@ namespace Submissions
 
 		public static List<Transactions.TransactionBase> GetListOfSubmissionsAll()
 		{
-			return LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid ("*",String.Format (" and {0}='{1}' ",TransactionsTable.TYPE, TransactionsTable.T_SUBMISSION));
+			return LayoutDetails.Instance.TransactionsList.GetEventsForLayoutGuid ("*",String.Format (" and {0}='{1}' ",TransactionsTable.TYPE,  TransactionSubmission.T_SUBMISSION));
 		}
 
 		// the first row for populating fields
@@ -235,7 +243,7 @@ namespace Submissions
 			//add as destination
 			TransactionSubmission NewVersion = new TransactionSubmission(Current.GetRowData ());
 			//NewVersion.SetID(DBNull.Value);
-			NewVersion.RefreshType(TransactionsTable.T_SUBMISSION);
+			NewVersion.RefreshType( TransactionSubmission.T_SUBMISSION);
 			LayoutDetails.Instance.TransactionsList.AddEvent(NewVersion);
 		}
 
@@ -249,7 +257,7 @@ namespace Submissions
 			//add as destination
 			TransactionSubmissionDestination NewVersion = new TransactionSubmissionDestination(Current.GetRowData ());
 			//NewVersion.SetID(DBNull.Value);
-			NewVersion.RefreshType(TransactionsTable.T_SUBMISSION_DESTINATION);
+			NewVersion.RefreshType( TransactionSubmission.T_SUBMISSION_DESTINATION);
 			LayoutDetails.Instance.TransactionsList.AddEvent(NewVersion);
 		}
 
@@ -326,7 +334,7 @@ namespace Submissions
 
 		private static bool IsDestination (TransactionSubmission Sub)
 		{
-			if (Sub.GetTypeCode == TransactionsTable.T_SUBMISSION_DESTINATION.ToString ()) {
+			if (Sub.GetTypeCode ==  TransactionSubmission.T_SUBMISSION_DESTINATION.ToString ()) {
 				return true;
 			}
 			return false;
