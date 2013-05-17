@@ -84,10 +84,11 @@ namespace MefAddIns
 		dashboardMarketEdit MarketEdit = null;
 		TabControl Tabs = null;
 		ViewProjectSubmissions ViewOfProjectSubmissions = null;
-		Label LabelProject = null;
+	//	Label LabelProject = null;
 		Label Warnings = null;
-		Label LabelMarket = null;
+	//	Label LabelMarket = null;
 		Button ToggleBetweenListAndEditSubmissions = null;
+		Button AddSubmission=null;
 
 		GroupBox SubmitPanel = null;
 		#endregion
@@ -314,28 +315,28 @@ namespace MefAddIns
 			SubmitPanel.Dock = DockStyle.Bottom;
 			SubmitPanel.Text = Loc.Instance.GetString ("ADD A SUBMISSION");
 		
-			LabelProject = new Label ();
-			LabelProject.Text = DefaultProjectLabel; //Loc.Instance.GetString ("Current Project: ");
-			LabelProject.Dock = DockStyle.Top;
-
-			LabelMarket = new Label ();
-			LabelMarket.Text = Loc.Instance.GetString ("Current Market: ");
-			LabelMarket.Dock = DockStyle.Top;
+//			LabelProject = new Label ();
+//			LabelProject.Text = DefaultProjectLabel; //Loc.Instance.GetString ("Current Project: ");
+//			LabelProject.Dock = DockStyle.Top;
+//
+//			LabelMarket = new Label ();
+//			LabelMarket.Text = Loc.Instance.GetString ("Current Market: ");
+//			LabelMarket.Dock = DockStyle.Top;
 
 			Warnings = new Label ();
 			Warnings.Text = Loc.Instance.GetString ("Warnings ");
-			Warnings.Dock = DockStyle.Bottom;
+			Warnings.Dock = DockStyle.Fill;
 
 
-			Button AddSubmission = new Button ();
-			AddSubmission.Text = Loc.Instance.GetString ("Submit this project to this market");
+			AddSubmission = new Button ();
+			AddSubmission.Text = Loc.Instance.GetStringFmt ("Submit {0} to {1}", DefaultProjectLabel,SelectedMarket);
 			AddSubmission.Click += HandleAddSubmissionClick;
 			AddSubmission.Dock = DockStyle.Bottom;
 
 
 
-			SubmitPanel.Controls.Add (LabelMarket);
-			SubmitPanel.Controls.Add (LabelProject);
+//			SubmitPanel.Controls.Add (LabelMarket);
+//			SubmitPanel.Controls.Add (LabelProject);
 
 			SubmitPanel.Controls.Add (Warnings);
 
@@ -424,7 +425,7 @@ namespace MefAddIns
 			SelectedMarket = MarketName;
 			SelectedMarketGuid = MarketGUID;
 		//	NewMessage.Show ("here2");
-			LabelMarket.Text = Loc.Instance.GetStringFmt ("Market: {0}", SelectedMarket);
+		//	LabelMarket.Text = Loc.Instance.GetStringFmt ("Market: {0}", SelectedMarket);
 		
 			RefreshWarningsAfterMarketAndProjectUpdated();
 
@@ -447,18 +448,16 @@ namespace MefAddIns
 				if (MarketEdit.WordsOver (SelectedGUID) == true) {
 					WarningsList.Add (Warning.WORDS);
 				}
-				if ( ViewOfProjectSubmissions.Available == false ) {
+				if (ViewOfProjectSubmissions.Available == false) {
 					WarningsList.Add (Warning.PROJECT_BUSY);
 				}
 				bool ProjectSentHereBefore = false;
 				bool MarketAvailable = true;
-				SubmissionMaster.GetMarketDetailsForWarnings(SelectedMarketGuid, SelectedGUID, out MarketAvailable, out ProjectSentHereBefore);
-				if (false ==MarketAvailable)
-				{
+				SubmissionMaster.GetMarketDetailsForWarnings (SelectedMarketGuid, SelectedGUID, out MarketAvailable, out ProjectSentHereBefore);
+				if (false == MarketAvailable) {
 					WarningsList.Add (Warning.MARKET_BUSY);
 				}
-				if (true == ProjectSentHereBefore)
-				{
+				if (true == ProjectSentHereBefore) {
 					WarningsList.Add (Warning.PROJECT_HERE_BEFORE);
 				}
 			}
@@ -497,8 +496,13 @@ namespace MefAddIns
 			if (Constants.BLANK == WarningText) {
 				Warnings.Text = Loc.Instance.GetString ("No warnings.");
 			}
-
-
+			if (SelectedName == Constants.BLANK) {
+				AddSubmission.Enabled = false;
+				AddSubmission.Text = Loc.Instance.GetString("Select a Layout");
+			} else {
+				AddSubmission.Enabled = true;
+				AddSubmission.Text = Loc.Instance.GetStringFmt ("Submit {0} to {1}", SelectedName, SelectedMarket);
+			}
 		}
 
 
@@ -520,8 +524,8 @@ namespace MefAddIns
 				MarketEdit.UpdateProjectInformationForFilterBox (SelectedGUID, MasterOfLayouts.GetWordsFromGuid (SelectedGUID));
 				//UpdateDoTheyLikeMe(SelectedGUID);
 			}
-
-			LabelProject.Text = Loc.Instance.GetStringFmt ("Project: {0}", Messages);
+		
+			//LabelProject.Text = Loc.Instance.GetStringFmt ("Project: {0}", Messages);
 		
 		
 			UpdateToggleButtonText ();
@@ -548,7 +552,7 @@ namespace MefAddIns
 //				 DateTime.Now, "Some Note", "no rights", "first draft", "Invalid", "No feedback", "Submission", SelectedMarket));
 
 			//	string MarketDetails = String.Format("{0} {1} {2}", SelectedMarket, MarketEdit.CurrentMarketType, MarketEdit.CurrentMarketPrint);
-
+				AddSubmission.Text = Loc.Instance.GetStringFmt ("Submit {0} to {1}", DefaultProjectLabel,SelectedMarket);
 				AddEditSubmissionsForm AddForm = new AddEditSubmissionsForm(true);
 
 				int words = MasterOfLayouts.GetWordsFromGuid(SelectedGUID);
@@ -683,9 +687,9 @@ namespace MefAddIns
 
 
 
-				LabelProject.ForeColor = app.captionForeground;
+			//	LabelProject.ForeColor = app.captionForeground;
 				this.Warnings.ForeColor = app.captionForeground;
-				LabelMarket.ForeColor = app.captionForeground;
+			//	LabelMarket.ForeColor = app.captionForeground;
 				SubmitPanel.BackColor = app.mainBackground;
 				SubmitPanel.ForeColor = app.captionForeground;
 			}
