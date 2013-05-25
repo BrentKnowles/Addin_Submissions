@@ -42,6 +42,8 @@ using Transactions;
 using System.Collections.Generic;
 using appframe;
 
+
+
 namespace MefAddIns
 {
 
@@ -580,6 +582,8 @@ namespace MefAddIns
 
 					ViewOfProjectSubmissions.BuildList();
 					ViewOfProjectSubmissions.UpdateDoTheyLikeMe(SelectedGUID);
+
+
 				}
 
 

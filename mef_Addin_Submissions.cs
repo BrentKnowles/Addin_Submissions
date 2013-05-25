@@ -65,8 +65,9 @@ namespace MefAddIns
 		public string Version
 		{
 			// version history
+			// 1.4 - cleaning up Market object
 			// 1.2 - remove destination from default submission type table becaues end users to do not need it
-			get { return @"1.3.0.0"; }
+			get { return @"1.4.0.0"; }
 		}
 		public string Description
 		{

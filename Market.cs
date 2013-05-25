@@ -47,7 +47,7 @@ namespace Submissions
 
 
 		private bool retired = false;
-
+		[CategoryAttribute(MARKETDETAILS)]
 		public bool Retired {
 			get {
 				return retired;
@@ -59,7 +59,7 @@ namespace Submissions
 
 
 		private string caption = Loc.Instance.GetString ("New Market");
-
+		[CategoryAttribute(MARKETDETAILS)]
 		public string Caption {
 			get {
 				return caption;
@@ -71,6 +71,8 @@ namespace Submissions
 
 		private string guid = Constants.BLANK;
 
+		[ReadOnly(true)]
+		[CategoryAttribute("Advanced")]
 		public string Guid {
 			get {
 				return guid;
@@ -80,7 +82,7 @@ namespace Submissions
 			}
 		}
 
-		private string mEditor;
+		private string mEditor=Loc.Instance.GetString ("Editor");
 		private string mAddress;
 		private string mCity;
 		private string mProvince;
@@ -447,7 +449,7 @@ namespace Submissions
 		}
 
 		private string notes = Constants.BLANK;
-
+		[Browsable(false)]
 		public string Notes {
 			get {
 				return notes;
