@@ -456,6 +456,10 @@ namespace MefAddIns
 			} catch (Exception ex) {
 				NewMessage.Show (ex.ToString());
 			}
+			// June 2013 - select nothing to avoid confusion about what *should* be selected
+			// after an add
+			ListOfSubs.SelectedIndex = -1;
+			Destinations.SelectedIndex = -1;
 		}
 
 
