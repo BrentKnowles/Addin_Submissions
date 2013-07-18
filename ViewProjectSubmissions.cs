@@ -301,10 +301,12 @@ namespace MefAddIns
 		void HandleDeleteSubmissionClick (object sender, EventArgs e)
 		{
 			if (ListOfSubs.SelectedItem != null) {
+				Transactions.TransactionSubmission SubmisisonTransaction = (Transactions.TransactionSubmission) ListOfSubs.SelectedItem;
 				if (NewMessage.Show (Loc.Instance.GetString ("Delete This Submission?"), 
-				                     Loc.Instance.GetString ("Do you really want to permanently delete this submission?"),
+				                     Loc.Instance.GetStringFmt ("Do you really want to permanently delete this submission (Market: {0})?",
+				                           SubmisisonTransaction.MarketName),
 				                     MessageBoxButtons.YesNo, null) == DialogResult.Yes) {
-					Transactions.TransactionSubmission SubmisisonTransaction = (Transactions.TransactionSubmission) ListOfSubs.SelectedItem;
+
 					if (SubmisisonTransaction != null)
 					{
 						LayoutDetails.Instance.TransactionsList.DeleteEvent(Transactions.TransactionsTable.ID, SubmisisonTransaction.ID);

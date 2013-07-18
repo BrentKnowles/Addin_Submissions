@@ -244,6 +244,7 @@ namespace Submissions
 			TransactionSubmission NewVersion = new TransactionSubmission(Current.GetRowData ());
 			//NewVersion.SetID(DBNull.Value);
 			NewVersion.RefreshType( TransactionSubmission.T_SUBMISSION);
+			NewVersion.SubmissionDate = DateTime.Today;
 			LayoutDetails.Instance.TransactionsList.AddEvent(NewVersion);
 		}
 
