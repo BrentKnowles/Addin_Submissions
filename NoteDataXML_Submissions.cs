@@ -208,6 +208,7 @@ namespace MefAddIns
 				CreateReplyFeedbackTable();
 			}
 		}
+		ComboBox LastQuery = null;
 
 		protected override void DoBuildChildren (LayoutPanelBase Layout)
 		{
@@ -275,7 +276,7 @@ namespace MefAddIns
 
 
 			SubmissionPage.Controls.Add (ToggleBetweenListAndEditSubmissions);
-
+			LastQuery = new ComboBox ();
 			ViewOfProjectSubmissions = new ViewProjectSubmissions (GetProjectGUID, GetMarketObjectByGUID, this.Layout);
 			ViewOfProjectSubmissions.Visible = false;
 			ViewOfProjectSubmissions.Dock = DockStyle.Fill;
@@ -344,7 +345,7 @@ namespace MefAddIns
 
 			SubmitPanel.Controls.Add (AddSubmission);
 
-			ComboBox LastQuery = new ComboBox ();
+
 			System.Collections.Generic.List<string> queries = LayoutDetails.Instance.TableLayout.GetListOfStringsFromSystemTable (LayoutDetails.SYSTEM_QUERIES, 1);
 			queries.Sort ();
 			LastQuery.DropDownStyle = ComboBoxStyle.DropDownList;
@@ -359,6 +360,7 @@ namespace MefAddIns
 			SubmissionPanel.CurrentFilter = CurrentFilter;
 			//LastQuery.Text = "LastQuery";
 			LastQuery.Dock = DockStyle.Top;
+			//LastQuery.Enabled = false;
 			SubmissionPage.Controls.Add (LastQuery);
 
 
@@ -382,8 +384,16 @@ namespace MefAddIns
 		void UpdateToggleButtonText ()
 		{
 			if ((int)ToggleBetweenListAndEditSubmissions.Tag == 0) {
+				if (LastQuery != null)
+				{
+					LastQuery.Enabled = true;
+				}
 				ToggleBetweenListAndEditSubmissions.Text = Loc.Instance.GetStringFmt ("Flip: Submissions For '{0}'", SelectedName);
 			} else {
+				if (LastQuery != null)
+				{
+					LastQuery.Enabled = false;
+				}
 				ToggleBetweenListAndEditSubmissions.Text = Loc.Instance.GetString ("Flip: Submission Overview");
 			}
 		}

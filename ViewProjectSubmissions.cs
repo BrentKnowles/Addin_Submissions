@@ -68,6 +68,7 @@ namespace MefAddIns
 		ToolStripButton MakeDestination = null;
 		ToolStripButton DeleteSelected = null;
 		ToolStripButton GenerateCoverLetter=null;
+	//	private ComboBox LastQuery= null; // this is the query dropdown
 		#endregion
 
 		public void SetLabel (string main, string update)
@@ -80,6 +81,8 @@ namespace MefAddIns
 		public ViewProjectSubmissions(Func<string> _GetProjectGUID, getmarketbyguiddelegate _GetMarketByGUID, LayoutPanelBase _Layout)
 		{
 		
+			//LastQuery = _LastQuery;
+
 			myLayout = _Layout;
 			GetProjectGUID = _GetProjectGUID;
 			GetMarketByGUID = _GetMarketByGUID;
